@@ -1,1 +1,1 @@
-# CurrencyFair-Android-Challenge
+# CurrencyFair Android Challenge
