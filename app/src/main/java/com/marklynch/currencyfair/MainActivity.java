@@ -12,14 +12,18 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 
 import com.marklynch.currencyfair.ui.main.MainFragment;
+import com.marklynch.currencyfair.ui.main.MainViewModel;
 
 public class MainActivity extends AppCompatActivity {
+
+    private MainViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
+        viewModel = new MainViewModel(getApplication());
 
 //Set colors for navigation and status bars
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -43,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
                 retrieveSearchResults(query);
                 return true;
             }
+
             @Override
             public boolean onQueryTextChange(String query) {
                 retrieveSearchResults(query);
@@ -56,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
                     .replace(R.id.container, MainFragment.newInstance())
                     .commitNow();
         }
+
+        viewModel.flickrResponseLiveDataLiveData.fetchImages("CAKE");
     }
 
     public void retrieveSearchResults(String query) {
