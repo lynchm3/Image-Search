@@ -1,13 +1,11 @@
 package com.marklynch.currencyfair.ui.main;
 
 import android.app.Application;
-import android.content.Context;
 
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.ViewModel;
 
 import com.marklynch.currencyfair.livedata.network.NetworkInfoLiveData;
-import com.marklynch.currencyfair.livedata.weather.FlickrResponseLiveData;
+import com.marklynch.currencyfair.livedata.flickr.FlickrResponseLiveData;
 
 public class MainViewModel extends AndroidViewModel {
 

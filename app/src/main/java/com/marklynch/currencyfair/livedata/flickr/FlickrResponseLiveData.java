@@ -1,11 +1,14 @@
-package com.marklynch.currencyfair.livedata.weather;
+package com.marklynch.currencyfair.livedata.flickr;
 
-import android.app.Application;
 import android.content.Context;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.marklynch.currencyfair.livedata.flickr.data.FlickrSearchResponse;
+import com.marklynch.currencyfair.livedata.flickr.data.Photo;
 import com.readystatesoftware.chuck.ChuckInterceptor;
+
+import java.util.List;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -17,7 +20,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 import timber.log.Timber;
 
-public class FlickrResponseLiveData extends MutableLiveData<String> {
+public class FlickrResponseLiveData extends MutableLiveData<List<Photo>> {
 
     private Retrofit retrofit;
     private FlickrSearchService apiService;
@@ -30,9 +33,10 @@ public class FlickrResponseLiveData extends MutableLiveData<String> {
     private static final String PAGE = "page";
     private static final String FORMAT = "format";
     private static final String NO_JSON_CALLBACK = "nojsoncallback";
+    private static final String PER_PAGE = "per_page";
 
     private static final String BASE_URL = "https://api.flickr.com";
-    private static final String REST_METHOD = "/services/rest";
+    private static final String REST_API_METHOD = "/services/rest";
     private static final String baseSearchUrl = "https://api.flickr.com/services/rest/?method=flickr.photos.search";
     private static final String baseSizesUrl = "https://api.flickr.com/services/rest/?method=flickr.photos.getSizes";
 
@@ -43,18 +47,17 @@ public class FlickrResponseLiveData extends MutableLiveData<String> {
 
     public void fetchImages(String query) {
 
+        Call<FlickrSearchResponse> call = apiService.search("flickr.photos.search", apiKey, query, 1, "json", 2, 20);
 
-        Call<String> call = apiService.search("flickr.photos.search", apiKey, query, "1", "json", "1");
-
-        call.enqueue(new Callback<String>() {
+        call.enqueue(new Callback<FlickrSearchResponse>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                String flickrResponse = response.body();
-                Timber.i("flickrResponse = " + flickrResponse);
+            public void onResponse(Call<FlickrSearchResponse> call, Response<FlickrSearchResponse> response) {
+                FlickrSearchResponse flickrSearchResponse = response.body();
+                postValue(flickrSearchResponse.photos.photo);
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable throwable) {
+            public void onFailure(Call<FlickrSearchResponse> call, Throwable throwable) {
                 Timber.e(throwable);
             }
         });
@@ -67,18 +70,18 @@ public class FlickrResponseLiveData extends MutableLiveData<String> {
         return new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .client(okHttpClient)
-//                .addConverterFactory(JacksonConverterFactory.create())
+                .addConverterFactory(JacksonConverterFactory.create())
                 .build();
     }
 
     public interface FlickrSearchService {
-
-        @GET(REST_METHOD)
-        Call<String> search(@Query(METHOD) String method,
-                            @Query(API_KEY) String apiKey,
-                            @Query(TEXT) String text,
-                            @Query(PAGE) String page,
-                            @Query(FORMAT) String format,
-                            @Query(NO_JSON_CALLBACK) String noJsonCallback);
+        @GET(REST_API_METHOD)
+        Call<FlickrSearchResponse> search(@Query(METHOD) String method,
+                                          @Query(API_KEY) String apiKey,
+                                          @Query(TEXT) String text,
+                                          @Query(PAGE) int page,
+                                          @Query(FORMAT) String format,
+                                          @Query(NO_JSON_CALLBACK) int noJsonCallback,
+                                          @Query(PER_PAGE) int perPage);
     }
 }

@@ -14,6 +14,8 @@ import androidx.appcompat.widget.Toolbar;
 import com.marklynch.currencyfair.ui.main.MainFragment;
 import com.marklynch.currencyfair.ui.main.MainViewModel;
 
+import timber.log.Timber;
+
 public class MainActivity extends AppCompatActivity {
 
     private MainViewModel viewModel;
@@ -50,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String query) {
-                retrieveSearchResults(query);
                 return true;
             }
         });
@@ -62,11 +63,14 @@ public class MainActivity extends AppCompatActivity {
                     .commitNow();
         }
 
-        viewModel.flickrResponseLiveDataLiveData.fetchImages("CAKE");
+        // Observer photos livedata
+        viewModel.flickrResponseLiveDataLiveData.observe(this,
+                photos ->
+                        Timber.i("flickrSearchResponse = " + photos));
     }
 
     public void retrieveSearchResults(String query) {
-
+        viewModel.flickrResponseLiveDataLiveData.fetchImages(query);
     }
 
     @Override
