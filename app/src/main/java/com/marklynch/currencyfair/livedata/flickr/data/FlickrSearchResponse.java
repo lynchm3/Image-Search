@@ -1,4 +1,4 @@
-package com.marklynch.currencyfair.livedata.flickr;
+package com.marklynch.currencyfair.livedata.flickr.data;
 
 //{"photos":
 //        {"page":1,"pages":2236,"perpage":100,"total":"223547","photo":
