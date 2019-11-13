@@ -25,15 +25,18 @@ public class FlickrResponseLiveData extends MutableLiveData<List<Photo>> {
     private Retrofit retrofit;
     private FlickrSearchService apiService;
 
-    private static final String apiKey = "297af75d9d68977b69513409fc928ca8";
-    private static final String APP_SECRET = "a539372c236f1f6b";
-    private static final String METHOD = "method";
+    private static final String METHOD_KEY = "method";
+    private static final String SEARCH_METHOD_VALUE = "flickr.photos.search";
     private static final String API_KEY = "api_key";
-    private static final String TEXT = "text";
-    private static final String PAGE = "page";
-    private static final String FORMAT = "format";
-    private static final String NO_JSON_CALLBACK = "nojsoncallback";
-    private static final String PER_PAGE = "per_page";
+    private static final String API_KEY_VALUE = "297af75d9d68977b69513409fc928ca8";
+    private static final String TEXT_KEY = "text";
+    private static final String PAGE_KEY = "page";
+    private static final String FORMAT_KEY = "format";
+    private static final String FORMAT_VALUE = "json";
+    private static final String NO_JSON_CALLBACK_KEY = "nojsoncallback";
+    private static final int NO_JSON_CALLBACK_VALUE = 1;
+    private static final String PER_PAGE_KEY = "per_page";
+    private static final int PER_PAGE_VALUE = 20;
 
     private static final String BASE_URL = "https://api.flickr.com";
     private static final String REST_API_METHOD = "/services/rest";
@@ -45,9 +48,9 @@ public class FlickrResponseLiveData extends MutableLiveData<List<Photo>> {
         this.apiService = retrofit.create(FlickrSearchService.class);
     }
 
-    public void fetchImages(String query) {
+    public void retrieveSearchResults(String query) {
 
-        Call<FlickrSearchResponse> call = apiService.search("flickr.photos.search", apiKey, query, 1, "json", 2, 20);
+        Call<FlickrSearchResponse> call = apiService.search(SEARCH_METHOD_VALUE, API_KEY_VALUE, query, 1, FORMAT_VALUE, NO_JSON_CALLBACK_VALUE, PER_PAGE_VALUE);
 
         call.enqueue(new Callback<FlickrSearchResponse>() {
             @Override
@@ -76,12 +79,12 @@ public class FlickrResponseLiveData extends MutableLiveData<List<Photo>> {
 
     public interface FlickrSearchService {
         @GET(REST_API_METHOD)
-        Call<FlickrSearchResponse> search(@Query(METHOD) String method,
+        Call<FlickrSearchResponse> search(@Query(METHOD_KEY) String method,
                                           @Query(API_KEY) String apiKey,
-                                          @Query(TEXT) String text,
-                                          @Query(PAGE) int page,
-                                          @Query(FORMAT) String format,
-                                          @Query(NO_JSON_CALLBACK) int noJsonCallback,
-                                          @Query(PER_PAGE) int perPage);
+                                          @Query(TEXT_KEY) String text,
+                                          @Query(PAGE_KEY) int page,
+                                          @Query(FORMAT_KEY) String format,
+                                          @Query(NO_JSON_CALLBACK_KEY) int noJsonCallback,
+                                          @Query(PER_PAGE_KEY) int perPage);
     }
 }

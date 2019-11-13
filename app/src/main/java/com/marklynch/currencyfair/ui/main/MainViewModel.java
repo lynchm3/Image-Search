@@ -21,4 +21,9 @@ public class MainViewModel extends AndroidViewModel {
         NetworkInfoLiveData networkInfoLiveData;
     }
 
+    public void retrieveSearchResults(String query)
+    {
+        flickrResponseLiveDataLiveData.retrieveSearchResults(query);
+    }
+
 }

@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void retrieveSearchResults(String query) {
-        viewModel.flickrResponseLiveDataLiveData.fetchImages(query);
+        viewModel.retrieveSearchResults(query);
     }
 
     @Override
