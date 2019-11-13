@@ -9,8 +9,8 @@
         <item name="android:navigationBarColor">@color/colorPrimary</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="actionBarSize">48dp</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+<!--        <item name="windowActionBar">false</item>-->
+<!--        <item name="windowNoTitle">true</item>-->
     </style>
 
     <style name="h1" parent="AppTheme">
