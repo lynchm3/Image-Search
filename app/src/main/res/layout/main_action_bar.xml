@@ -6,7 +6,8 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:elevation="0dp">
+        app:elevation="0dp"
+        android:background="#00000000">
 
 
         <androidx.appcompat.widget.Toolbar
@@ -21,7 +22,8 @@
             android:contentInsetRight="0dp"
             android:contentInsetEnd="0dp"
             app:contentInsetRight="0dp"
-            app:contentInsetEnd="0dp">
+            app:contentInsetEnd="0dp"
+            android:background="#00000000">
 
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/search_view"

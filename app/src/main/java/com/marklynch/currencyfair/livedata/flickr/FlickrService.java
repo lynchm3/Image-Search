@@ -10,12 +10,13 @@ import com.marklynch.currencyfair.livedata.flickr.data.Photo;
 import com.marklynch.currencyfair.livedata.flickr.data.Size;
 import com.readystatesoftware.chuck.ChuckInterceptor;
 
+import org.reactivestreams.Subscriber;
+
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Single;
-import io.reactivex.SingleObserver;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -39,7 +40,7 @@ public class FlickrService {
     private static final String GET_SIZES_METHOD_VALUE = "flickr.photos.getSizes";
     private static final String API_KEY = "api_key";
     private static final String API_KEY_VALUE = "297af75d9d68977b69513409fc928ca8";
-    private static final String TEXT_KEY = "text";
+    private static final String TAGS_KEY = "tags";
     private static final String PAGE_KEY = "page";
     private static final String FORMAT_KEY = "format";
     private static final String FORMAT_JSON = "json";
@@ -61,41 +62,70 @@ public class FlickrService {
 
     public void getPhotoUrlsFromSearchTerm(String query, MutableLiveData<List<String>> callback) throws IOException {
         //START THREAD
+        Timber.d("getPhotoUrlsFromSearchTerm");
+        getPhotoUrls(query)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Timber.d("onSubscribe");
+                    }
 
-
-        for (int i = 0; i < 10; i++) {
-            getPhotoUrls(query)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new SingleObserver<List<String>>() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
-                            Timber.d("onSubscribe");
+                    @Override
+                    public void onNext(String url) {
+                        List<String> urls = callback.getValue();
+                        if (!urls.contains(url)) {
+                            urls.add(url);
+                            callback.postValue(urls);
                         }
+                    }
 
-                        @Override
-                        public void onSuccess(List<String> response) {
-                            callback.postValue(response);
-                        }
+                    @Override
+                    public void onError(Throwable e) {
+                        Timber.e(e);
+                    }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            Timber.e(e);
-                        }
+                    @Override
+                    public void onComplete() {
 
-                    });
-        }
+                    }
+                });
     }
 
-    public Single<List<String>> getPhotoUrls(String query) {
-        return Single.create(s ->
+    private final String[] preferredSizes = {
+            "Large Square"
+    };
+
+    public Observable<String> getPhotoUrls(String query) {
+        return Observable.create(s ->
         {
+            Timber.d("inside the thread");
             List<Photo> photos = searchRequest(query);
-            ArrayList<String> urls = new ArrayList<>();
             for (Photo photo : photos) {
-                urls.add(getSizesRequest(photo));
+                FlickrGetSizesResponse flickrGetSizesResponse = getSizesRequest(photo);
+                String url = getUrlArPreferredSize(flickrGetSizesResponse);
+                if (url != null)
+                    s.onNext(url);
             }
+            s.onComplete();
         });
+    }
+
+    public String getUrlArPreferredSize(FlickrGetSizesResponse flickrGetSizesResponse) {
+        if (flickrGetSizesResponse == null || flickrGetSizesResponse.sizes == null || flickrGetSizesResponse.sizes.size == null)
+            return null;
+
+        List<Size> sizesFromResponse = flickrGetSizesResponse.sizes.size;
+
+        for (String preferredSize : preferredSizes) {
+            for (Size sizeFromResponse : sizesFromResponse) {
+                if (preferredSize.equals(sizeFromResponse.label)) {
+                    return sizeFromResponse.source;
+                }
+            }
+        }
+        return null;
     }
 
     public List<Photo> searchRequest(String query) throws IOException {
@@ -104,10 +134,11 @@ public class FlickrService {
         return response.body().photos.photo;
     }
 
-    public String getSizesRequest(Photo photo) throws IOException {
+    public FlickrGetSizesResponse getSizesRequest(Photo photo) throws IOException {
         Call<FlickrGetSizesResponse> call = apiService.getSizes(GET_SIZES_METHOD_VALUE, API_KEY_VALUE, photo.id, FORMAT_JSON, NO_JSON_CALLBACK);
         Response<FlickrGetSizesResponse> response = call.execute();
-        return response.body().sizes.size.get(0).url;
+
+        return response.body();
     }
 
     private Retrofit getRetrofitInstance(String baseUrl, Context context) {
@@ -126,7 +157,7 @@ public class FlickrService {
         @GET(REST_API)
         Call<FlickrSearchResponse> search(@Query(METHOD_KEY) String method,
                                           @Query(API_KEY) String apiKey,
-                                          @Query(TEXT_KEY) String text,
+                                          @Query(TAGS_KEY) String text,
                                           @Query(PAGE_KEY) int page,
                                           @Query(FORMAT_KEY) String format,
                                           @Query(NO_JSON_CALLBACK_KEY) int noJsonCallback,

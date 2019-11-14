@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -15,31 +16,35 @@ import com.marklynch.currencyfair.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 
 public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewHolder> {
 
     private Activity activity;
     private LayoutInflater mInflater;
     private List<String> photoUrls = new ArrayList<String>();
+    private int spaceAtTopInPixels;
 
     private static RequestOptions options = new RequestOptions()
-            .centerCrop()
-            .placeholder(R.mipmap.ic_launcher_round)
-            .error(R.mipmap.ic_launcher_round);
+            .centerCrop();
 
     public ImagesAdapter(
             Activity activity) {
         this.activity = activity;
         mInflater = LayoutInflater.from(activity);
 
+        final float scale = activity.getResources().getDisplayMetrics().density;
+        spaceAtTopInPixels = (int) (56 * scale + 0.5f);
     }
 
 
     class ImageViewHolder extends RecyclerView.ViewHolder {
-        //        ImageView imageView;
+        public ImageView imageView;
+
         public ImageViewHolder(View itemView) {
             super(itemView);
-//            ImageView imageView = itemView.findViewById(R.id.iv);
+            this.imageView = itemView.findViewById(R.id.imageview);
         }
     }
 
@@ -50,7 +55,17 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
 
     @Override
     public void onBindViewHolder(ImageViewHolder holder, int position) {
-        Glide.with(activity).load(photoUrls.get(position)).apply(options).into(((ImageView) holder.itemView));
+
+        Timber.d("onBindViewHolder url = " + photoUrls.get(position));
+
+        if (photoUrls.get(position) == null) {
+            holder.itemView.setLayoutParams(new ConstraintLayout.LayoutParams(spaceAtTopInPixels, spaceAtTopInPixels));
+            holder.imageView.setVisibility(View.INVISIBLE);
+        } else {
+            holder.itemView.setLayoutParams(new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            holder.imageView.setVisibility(View.VISIBLE);
+            Glide.with(activity).load(photoUrls.get(position)).apply(options).into(holder.imageView);
+        }
     }
 
     public void setPhotoUrls(List<String> photoUrls) {
