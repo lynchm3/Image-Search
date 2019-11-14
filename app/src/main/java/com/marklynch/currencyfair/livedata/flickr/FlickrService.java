@@ -2,24 +2,25 @@ package com.marklynch.currencyfair.livedata.flickr;
 
 import android.content.Context;
 
+import androidx.lifecycle.MutableLiveData;
+
 import com.marklynch.currencyfair.livedata.flickr.data.FlickrGetSizesResponse;
 import com.marklynch.currencyfair.livedata.flickr.data.FlickrSearchResponse;
 import com.marklynch.currencyfair.livedata.flickr.data.Photo;
+import com.marklynch.currencyfair.livedata.flickr.data.Size;
 import com.readystatesoftware.chuck.ChuckInterceptor;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
+import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -58,78 +59,55 @@ public class FlickrService {
         this.apiService = retrofit.create(FlickrSearchService.class);
     }
 
-    public Object getPhotosForSearchTerm(String query) throws IOException {
+    public void getPhotoUrlsFromSearchTerm(String query, MutableLiveData<List<String>> callback) throws IOException {
         //START THREAD
-        List<Photo> photos = searchRequest(query);
-        if (photos == null)
-            return null;
 
 
-        return null;
+        for (int i = 0; i < 10; i++) {
+            getPhotoUrls(query)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new SingleObserver<List<String>>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            Timber.d("onSubscribe");
+                        }
 
+                        @Override
+                        public void onSuccess(List<String> response) {
+                            callback.postValue(response);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Timber.e(e);
+                        }
+
+                    });
+        }
+    }
+
+    public Single<List<String>> getPhotoUrls(String query) {
+        return Single.create(s ->
+        {
+            List<Photo> photos = searchRequest(query);
+            ArrayList<String> urls = new ArrayList<>();
+            for (Photo photo : photos) {
+                urls.add(getSizesRequest(photo));
+            }
+        });
     }
 
     public List<Photo> searchRequest(String query) throws IOException {
-
-        Single<Response<FlickrSearchResponse>> request = apiService.search(SEARCH_METHOD_VALUE, API_KEY_VALUE, query, 1, FORMAT_JSON, NO_JSON_CALLBACK, PER_PAGE_VALUE);
-
-        request.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SingleObserver<Response<FlickrSearchResponse>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        Timber.d("onSubscribe");
-                    }
-
-                    @Override
-                    public void onSuccess(Response<FlickrSearchResponse> response) {
-                        FlickrSearchResponse body = response.body();
-                        if(body == null)
-                            return;
-                        Timber.d("onSuccess response.body() = %s", body);
-                        Timber.d("onSuccess response.body().photos = %s", body.photos);
-                        Timber.d("onSuccess response.body.photos.photo = %s", body.photos.photo);
-                        for(Photo photo : body.photos.photo)
-                        {
-                            getSizesRequest(photo);
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.e(e);
-                    }
-                });
-        return null;
+        Call<FlickrSearchResponse> call = apiService.search(SEARCH_METHOD_VALUE, API_KEY_VALUE, query, 1, FORMAT_JSON, NO_JSON_CALLBACK, PER_PAGE_VALUE);
+        Response<FlickrSearchResponse> response = call.execute();
+        return response.body().photos.photo;
     }
 
-    public void getSizesRequest(Photo photo) {
-
-        Single<Response<FlickrGetSizesResponse>> request =   apiService.getSizes(GET_SIZES_METHOD_VALUE, API_KEY_VALUE, photo.id, FORMAT_JSON, NO_JSON_CALLBACK);
-
-        request.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SingleObserver<Response<FlickrGetSizesResponse>>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        Timber.d("onSubscribe");
-                    }
-
-                    @Override
-                    public void onSuccess(Response<FlickrGetSizesResponse> response) {
-                        FlickrGetSizesResponse body = response.body();
-                        Timber.d("onSuccess response.body() = %s", body);
-//                        for(Photo photo : response.body().photos.photo)
-//                        {
-//                            getSizesRequest(photo);
-//                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.e(e);
-                    }
-                });
+    public String getSizesRequest(Photo photo) throws IOException {
+        Call<FlickrGetSizesResponse> call = apiService.getSizes(GET_SIZES_METHOD_VALUE, API_KEY_VALUE, photo.id, FORMAT_JSON, NO_JSON_CALLBACK);
+        Response<FlickrGetSizesResponse> response = call.execute();
+        return response.body().sizes.size.get(0).url;
     }
 
     private Retrofit getRetrofitInstance(String baseUrl, Context context) {
@@ -146,19 +124,19 @@ public class FlickrService {
 
     public interface FlickrSearchService {
         @GET(REST_API)
-        Single<Response<FlickrSearchResponse>> search(@Query(METHOD_KEY) String method,
-                                                      @Query(API_KEY) String apiKey,
-                                                      @Query(TEXT_KEY) String text,
-                                                      @Query(PAGE_KEY) int page,
-                                                      @Query(FORMAT_KEY) String format,
-                                                      @Query(NO_JSON_CALLBACK_KEY) int noJsonCallback,
-                                                      @Query(PER_PAGE_KEY) int perPage);
+        Call<FlickrSearchResponse> search(@Query(METHOD_KEY) String method,
+                                          @Query(API_KEY) String apiKey,
+                                          @Query(TEXT_KEY) String text,
+                                          @Query(PAGE_KEY) int page,
+                                          @Query(FORMAT_KEY) String format,
+                                          @Query(NO_JSON_CALLBACK_KEY) int noJsonCallback,
+                                          @Query(PER_PAGE_KEY) int perPage);
 
         @GET(REST_API)
-        Single<Response<FlickrGetSizesResponse>> getSizes(@Query(METHOD_KEY) String method,
-                                                    @Query(API_KEY) String apiKey,
-                                                    @Query(PHOTO_ID_KEY) String photoId,
-                                                    @Query(FORMAT_KEY) String format,
-                                                    @Query(NO_JSON_CALLBACK_KEY) int noJsonCallback);
+        Call<FlickrGetSizesResponse> getSizes(@Query(METHOD_KEY) String method,
+                                              @Query(API_KEY) String apiKey,
+                                              @Query(PHOTO_ID_KEY) String photoId,
+                                              @Query(FORMAT_KEY) String format,
+                                              @Query(NO_JSON_CALLBACK_KEY) int noJsonCallback);
     }
 }

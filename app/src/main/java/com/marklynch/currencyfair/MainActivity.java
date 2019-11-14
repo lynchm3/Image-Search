@@ -10,9 +10,11 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.marklynch.currencyfair.ui.main.MainFragment;
+import com.marklynch.currencyfair.ui.main.ImagesAdapter;
 import com.marklynch.currencyfair.ui.main.MainViewModel;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.io.IOException;
 
@@ -59,16 +61,25 @@ public class MainActivity extends AppCompatActivity {
         });
         searchView.setIconifiedByDefault(false);
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, MainFragment.newInstance())
-                    .commitNow();
-        }
+        //Recycler view recycler_view
+        RecyclerView recyclerView = findViewById(R.id.recycler_view);
+        ImagesAdapter recyclerViewAdapter = new ImagesAdapter(this);
+        recyclerView.setAdapter(recyclerViewAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+//        if (savedInstanceState == null) {
+//            getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.container, MainFragment.newInstance())
+//                    .commitNow();
+//        }
 
         // Observer photos livedata
-//        viewModel.flickrService.observe(this,
-//                photos ->
-//                        Timber.i("flickrSearchResponse = " + photos));
+        viewModel.photoUrls.observe(this,
+                photoUrls ->
+                {
+                    recyclerViewAdapter.setPhotoUrls(photoUrls);
+                    Timber.i("flickrSearchResponse = " + photoUrls);
+                });
     }
 
     public void retrieveSearchResults(String query) {
