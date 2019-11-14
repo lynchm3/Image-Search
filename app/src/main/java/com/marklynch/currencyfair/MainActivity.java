@@ -14,6 +14,8 @@ import androidx.appcompat.widget.Toolbar;
 import com.marklynch.currencyfair.ui.main.MainFragment;
 import com.marklynch.currencyfair.ui.main.MainViewModel;
 
+import java.io.IOException;
+
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
@@ -64,13 +66,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Observer photos livedata
-        viewModel.flickrResponseLiveDataLiveData.observe(this,
-                photos ->
-                        Timber.i("flickrSearchResponse = " + photos));
+//        viewModel.flickrService.observe(this,
+//                photos ->
+//                        Timber.i("flickrSearchResponse = " + photos));
     }
 
     public void retrieveSearchResults(String query) {
-        viewModel.retrieveSearchResults(query);
+        try {
+            viewModel.retrieveSearchResults(query);
+        } catch (IOException e) {
+            Timber.e(e);
+        }
     }
 
     @Override
@@ -90,13 +96,13 @@ public class MainActivity extends AppCompatActivity {
 //
 //            @Override
 //            public boolean onQueryTextSubmit(String query) {
-//                retrieveSearchResults(query);
+//                searchRequest(query);
 //                return true;
 //            }
 //
 //            @Override
 //            public boolean onQueryTextChange(String query) {
-//                retrieveSearchResults(query);
+//                searchRequest(query);
 //                return true;
 //            }
 //        });

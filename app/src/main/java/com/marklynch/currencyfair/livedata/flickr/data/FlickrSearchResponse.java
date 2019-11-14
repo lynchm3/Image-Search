@@ -15,4 +15,12 @@ public class FlickrSearchResponse {
     public Photos photos;
     @JsonProperty("stat")
     public String stat;
+
+    @Override
+    public String toString() {
+        return "FlickrSearchResponse{" +
+                "photos=" + photos +
+                ", stat='" + stat + '\'' +
+                '}';
+    }
 }

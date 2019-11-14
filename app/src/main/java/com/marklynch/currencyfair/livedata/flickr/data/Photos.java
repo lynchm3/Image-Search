@@ -17,4 +17,15 @@ public class Photos {
     public String total;
     @JsonProperty("photo")
     public List<Photo> photo = null;
+
+    @Override
+    public String toString() {
+        return "Photos{" +
+                "page=" + page +
+                ", pages=" + pages +
+                ", perpage=" + perpage +
+                ", total='" + total + '\'' +
+                ", photo=" + photo +
+                '}';
+    }
 }
