@@ -57,15 +57,13 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
     @Override
     public void onBindViewHolder(ImageViewHolder holder, int position) {
 
-        Timber.d("onBindViewHolder url = " + photoUrls.get(position));
-
-        if (photoUrls.get(position) == null) {
+        if (position == 0 || position == 1 || position == getItemCount() -1 || position == getItemCount() - 2) {
             holder.itemView.setLayoutParams(new ConstraintLayout.LayoutParams(spaceAtTopInPixels, spaceAtTopInPixels));
             holder.imageView.setVisibility(View.INVISIBLE);
         } else {
             holder.itemView.setLayoutParams(new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             holder.imageView.setVisibility(View.VISIBLE);
-            Glide.with(activity).load(photoUrls.get(position)).apply(options)
+            Glide.with(activity).load(photoUrls.get(position-2)).apply(options)
                     .transition(DrawableTransitionOptions.withCrossFade()).into(holder.imageView);
         }
     }
@@ -78,7 +76,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
 
     @Override
     public int getItemCount() {
-        return this.photoUrls.size();
+        return this.photoUrls.size() + 4;
     }
 }
 

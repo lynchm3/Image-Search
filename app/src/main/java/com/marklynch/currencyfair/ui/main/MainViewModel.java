@@ -22,10 +22,7 @@ public class MainViewModel extends AndroidViewModel {
     public MainViewModel(Application application) {
         super(application);
 
-        ArrayList<String> s = new ArrayList<>();
-        s.add(null);
-        s.add(null);
-        photoUrls.setValue(s);
+        photoUrls.setValue(new ArrayList<>());
 
         flickrService = new FlickrService(application);
 
@@ -35,10 +32,7 @@ public class MainViewModel extends AndroidViewModel {
 
     public void retrieveSearchResults(String query) throws IOException {
         Timber.d("viewModel.retrieveSearchResults");
-        ArrayList<String> s = new ArrayList<>();
-        s.add(null);
-        s.add(null);
-        photoUrls.setValue(s);
+        photoUrls.setValue(new ArrayList<>());
         flickrService.getPhotoUrlsFromSearchTerm(query, photoUrls);
     }
 
