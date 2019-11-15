@@ -36,7 +36,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
         mInflater = LayoutInflater.from(activity);
 
         final float scale = activity.getResources().getDisplayMetrics().density;
-        spaceAtTopInPixels = (int) (56 * scale + 0.5f);
+        spaceAtTopInPixels = (int) ((56 + 28) * scale + 0.5f);
     }
 
 
@@ -56,15 +56,16 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
 
     @Override
     public void onBindViewHolder(ImageViewHolder holder, int position) {
-
-        if (position == 0 || position == 1 || position == getItemCount() -1 || position == getItemCount() - 2) {
+        if (position == 0 || position == 1 || position == getItemCount() - 1 || position == getItemCount() - 2) {
             holder.itemView.setLayoutParams(new ConstraintLayout.LayoutParams(spaceAtTopInPixels, spaceAtTopInPixels));
             holder.imageView.setVisibility(View.INVISIBLE);
         } else {
+            String url = photoUrls.get(position - 2);
             holder.itemView.setLayoutParams(new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             holder.imageView.setVisibility(View.VISIBLE);
-            Glide.with(activity).load(photoUrls.get(position-2)).apply(options)
+            Glide.with(activity).load(url).apply(options)
                     .transition(DrawableTransitionOptions.withCrossFade()).into(holder.imageView);
+            holder.imageView.setTag(R.id.url_tag, url);
         }
     }
 

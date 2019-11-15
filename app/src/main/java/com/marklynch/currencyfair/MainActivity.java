@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -21,8 +22,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.marklynch.currencyfair.ui.main.ImagesAdapter;
 import com.marklynch.currencyfair.ui.main.MainViewModel;
 
-import java.io.IOException;
-
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private static int actionBarHeightPixels;//56dp
+
+    private int currentPage = 1;
+    private String currentSearchQuery = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +65,12 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Timber.d("onQueryTextSubmit");
-                retrieveSearchResults(query);
+                searchView.clearFocus();
+                hideKeyboard();
+                currentPage = 1;
+                currentSearchQuery = query;
+                viewModel.retrieveSearchResults(currentSearchQuery, currentPage, true);
+                swipeRefreshLayout.setRefreshing(true);
                 return true;
             }
 
@@ -81,6 +87,29 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                int maxScroll = recyclerView.computeVerticalScrollRange();
+                int currentScroll = recyclerView.computeVerticalScrollOffset() + recyclerView.computeVerticalScrollExtent();
+                if (maxScroll - currentScroll < 2000 && currentSearchQuery != null) {
+                    Toast.makeText(MainActivity.this, "LOADING", Toast.LENGTH_LONG).show();
+                    viewModel.retrieveSearchResults(currentSearchQuery, ++currentPage, false);
+                }
+            }
+        });
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (!recyclerView.canScrollVertically(1)) {
+                }
+            }
+        });
+
         //Fragment
 //        if (savedInstanceState == null) {
 //            getSupportFragmentManager().beginTransaction()
@@ -91,26 +120,16 @@ public class MainActivity extends AppCompatActivity {
         //Swipe refresh
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setEnabled(false);
-        swipeRefreshLayout.setProgressViewOffset (true, 0, 192);
+        swipeRefreshLayout.setProgressViewOffset(true, 0, 256);
 
         // Observer photos livedata
         viewModel.photoUrls.observe(this,
                 photoUrls ->
                 {
+                    Timber.d("OBSERVE");
                     swipeRefreshLayout.setRefreshing(false);
                     recyclerViewAdapter.setPhotoUrls(photoUrls);
                 });
-    }
-
-    public void retrieveSearchResults(String query) {
-        try {
-            Timber.d("activity.retrieveSearchResults");
-            viewModel.retrieveSearchResults(query);
-            hideKeyboard();
-            swipeRefreshLayout.setRefreshing(true);
-        } catch (IOException e) {
-            Timber.e(e);
-        }
     }
 
     @Override

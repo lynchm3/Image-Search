@@ -8,11 +8,8 @@ import androidx.lifecycle.MutableLiveData;
 import com.marklynch.currencyfair.livedata.flickr.FlickrService;
 import com.marklynch.currencyfair.livedata.network.NetworkInfoLiveData;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import timber.log.Timber;
 
 public class MainViewModel extends AndroidViewModel {
 
@@ -30,10 +27,10 @@ public class MainViewModel extends AndroidViewModel {
         NetworkInfoLiveData networkInfoLiveData;
     }
 
-    public void retrieveSearchResults(String query) throws IOException {
-        Timber.d("viewModel.retrieveSearchResults");
-        photoUrls.setValue(new ArrayList<>());
-        flickrService.getPhotoUrlsFromSearchTerm(query, photoUrls);
+    public void retrieveSearchResults(String query, int page, boolean newSearch) {
+        if (newSearch)
+            photoUrls.setValue(new ArrayList<>());
+        flickrService.getPhotoUrlsFromSearchTerm(query, photoUrls, page, getApplication());
     }
 
 }

@@ -1,16 +1,19 @@
 package com.marklynch.currencyfair.livedata.flickr;
 
+import android.app.Application;
 import android.content.Context;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.marklynch.currencyfair.livedata.flickr.data.FlickrGetSizesResponse;
 import com.marklynch.currencyfair.livedata.flickr.data.FlickrSearchResponse;
 import com.marklynch.currencyfair.livedata.flickr.data.Photo;
 import com.marklynch.currencyfair.livedata.flickr.data.Size;
 import com.readystatesoftware.chuck.ChuckInterceptor;
 
-import java.io.IOException;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
@@ -21,6 +24,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
+import timber.log.Timber;
 
 public class FlickrService {
 
@@ -39,7 +43,7 @@ public class FlickrService {
     private static final String NO_JSON_CALLBACK_KEY = "nojsoncallback";
     private static final int NO_JSON_CALLBACK = 1;
     private static final String PER_PAGE_KEY = "per_page";
-    private static final int PER_PAGE_VALUE = 20;
+    private static final int PER_PAGE = 20;
     private static final String PHOTO_ID_KEY = "photo_id";
 
     private static final String BASE_URL = "https://api.flickr.com";
@@ -52,20 +56,43 @@ public class FlickrService {
         this.apiService = retrofit.create(FlickrSearchService.class);
     }
 
-    public void getPhotoUrlsFromSearchTerm(String query, MutableLiveData<List<String>> liveData) throws IOException {
+    public void getPhotoUrlsFromSearchTerm(final String query, final MutableLiveData<List<String>> liveData, int page, Application application) {
+
+        final int[] count = {0};
+        final List<String> urls = liveData.getValue();
 
         Callback<FlickrGetSizesResponse> getSizesRequestCallback = new Callback<FlickrGetSizesResponse>() {
             @Override
             public void onResponse(Call<FlickrGetSizesResponse> call, Response<FlickrGetSizesResponse> response) {
+
                 String newUrl = getUrlAtPreferredSize(response.body());
-                List<String> urls = liveData.getValue();
-                if (!urls.contains(newUrl)) {
-                    urls.add(newUrl);
-                    liveData.postValue(urls);
+
+                Glide.with(application).load(newUrl).submit();
+
+                synchronized (liveData) {
+                    if (!urls.contains(newUrl))
+                        urls.add(newUrl);
+
+
+                    count[0]++;
+                    if (count[0] % PER_PAGE == 0) {
+
+                        Timber.d("Calling postvalue a, count == " + count[0]);
+                        liveData.postValue(urls);
+                    }
                 }
             }
 
-            @Override public void onFailure(Call<FlickrGetSizesResponse> call, Throwable t) {}
+            @Override
+            public void onFailure(Call<FlickrGetSizesResponse> call, Throwable t) {
+                synchronized (liveData) {
+                    count[0]++;
+                    if (count[0] % PER_PAGE == 0) {
+                        Timber.d("Calling postvalue b, count == " + count[0]);
+                        liveData.postValue(urls);
+                    }
+                }
+            }
         };
 
         Callback<FlickrSearchResponse> searchRequestCallback = new Callback<FlickrSearchResponse>() {
@@ -76,17 +103,19 @@ public class FlickrService {
                 }
             }
 
-            @Override public void onFailure(Call<FlickrSearchResponse> call, Throwable t) {}
+            @Override
+            public void onFailure(Call<FlickrSearchResponse> call, Throwable t) {
+            }
         };
 
-        searchRequest(query,searchRequestCallback);
+        searchRequest(query, page, searchRequestCallback);
     }
 
-    private void searchRequest(String query, Callback<FlickrSearchResponse> callback){
-        apiService.search(SEARCH_METHOD_VALUE, API_KEY_VALUE, query, 1, FORMAT_JSON, NO_JSON_CALLBACK, PER_PAGE_VALUE).enqueue(callback);
+    private void searchRequest(String query, int page, Callback<FlickrSearchResponse> callback) {
+        apiService.search(SEARCH_METHOD_VALUE, API_KEY_VALUE, query, page, FORMAT_JSON, NO_JSON_CALLBACK, PER_PAGE).enqueue(callback);
     }
 
-    private void getSizesRequest(Photo photo, Callback<FlickrGetSizesResponse> callback){
+    private void getSizesRequest(Photo photo, Callback<FlickrGetSizesResponse> callback) {
         apiService.getSizes(GET_SIZES_METHOD_VALUE, API_KEY_VALUE, photo.id, FORMAT_JSON, NO_JSON_CALLBACK).enqueue(callback);
     }
 
