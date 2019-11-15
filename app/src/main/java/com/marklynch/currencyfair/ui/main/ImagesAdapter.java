@@ -60,7 +60,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
             holder.itemView.setLayoutParams(new ConstraintLayout.LayoutParams(spaceAtTopInPixels, spaceAtTopInPixels));
             holder.imageView.setVisibility(View.INVISIBLE);
         } else {
-            String thumbUrl = imagesToDisplay.get(position - 2).thumbnailUrl;
+            String thumbUrl = imagesToDisplay.get(position - 2).thumb.source;
             holder.itemView.setLayoutParams(new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             holder.imageView.setVisibility(View.VISIBLE);
             Glide.with(holder.imageView).load(thumbUrl).apply(options)
@@ -70,7 +70,6 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
             holder.itemView.setOnClickListener(
                     v -> imageZoomer.zoomImageFromThumb(holder.imageView, imagesToDisplay.get(position - 2))
             );
-//
         }
     }
 
@@ -85,8 +84,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
         return this.imagesToDisplay.size() + 4;
     }
 
-    public interface ImageZoomer
-    {
+    public interface ImageZoomer {
         void zoomImageFromThumb(final ImageView thumbView, ImageToDisplay imageToDisplay);
     }
 

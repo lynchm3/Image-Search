@@ -66,11 +66,11 @@ public class FlickrService {
 
                 ImageToDisplay imageToDisplay = getImageToDisplay(response.body());
 
-                if (imageToDisplay != null && imageToDisplay.thumbnailUrl != null)
-                    Glide.with(application).load(imageToDisplay.thumbnailUrl).submit();
+                if (imageToDisplay != null && imageToDisplay.thumb.source != null)
+                    Glide.with(application).load(imageToDisplay.thumb.source).submit();
 
                 synchronized (liveData) {
-                    if (imageToDisplay != null && imageToDisplay.thumbnailUrl != null)
+                    if (imageToDisplay != null && imageToDisplay.thumb.source != null)
                         imagesToDisplay.add(imageToDisplay);
 
                     count[0]++;
@@ -121,22 +121,27 @@ public class FlickrService {
         if (flickrGetSizesResponse == null || flickrGetSizesResponse.sizes == null || flickrGetSizesResponse.sizes.size == null)
             return null;
 
-        List<Size> sizesFromResponse = flickrGetSizesResponse.sizes.size;
-        String thumbnailUrl = "";
-        String largeImageUrl = "";
+        ImageToDisplay imageToDisplay = new ImageToDisplay();
 
+        List<Size> sizesFromResponse = flickrGetSizesResponse.sizes.size;
+
+        Size largeSquare = null;
+        Size large = null;
         for (Size sizeFromResponse : sizesFromResponse) {
             if ("Large Square".equals(sizeFromResponse.label)) {
-                thumbnailUrl = sizeFromResponse.source;
+                imageToDisplay.thumb = sizeFromResponse;
             } else if ("Large".equals(sizeFromResponse.label)) {
-                largeImageUrl = sizeFromResponse.source;
+                imageToDisplay.large = sizeFromResponse;
             }
         }
 
-        if(largeImageUrl == null)
-            largeImageUrl = thumbnailUrl;
+        if (imageToDisplay.thumb == null)
+            return null;
 
-        return new ImageToDisplay(thumbnailUrl, largeImageUrl);
+        if(imageToDisplay.large == null)
+            imageToDisplay.large = imageToDisplay.thumb;
+
+        return imageToDisplay;
     }
 
     private Retrofit getRetrofitInstance(String baseUrl, Context context) {

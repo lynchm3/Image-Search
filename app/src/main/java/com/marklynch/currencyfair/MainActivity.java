@@ -217,24 +217,29 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
 //        expandedImageView.setImageBitmap(thumbView.getDrawable());
 
 
-        RequestOptions options = new RequestOptions().placeholder(thumbView.getDrawable());
+        RequestOptions options = new RequestOptions();//.placeholder(thumbView.getDrawable());
 
-        Glide.with(getApplication()).load(imageToDisplay.largeImageUrl).listener(
+        Glide.with(getApplication())
+                .load(imageToDisplay.large.source)
+                .thumbnail(Glide.with(getApplication()).load(imageToDisplay.thumb.source))
+                .listener(
+                        new RequestListener() {
+                            @Override
+                            public boolean onLoadFailed(GlideException e, Object model, Target target, boolean isFirstResource) {
+                                largeImageLoadingLayout.setVisibility(View.GONE);
+//                        expandedImageView.setLayoutParams(new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                                return false;
+                            }
 
-                new RequestListener() {
-                    @Override
-                    public boolean onLoadFailed(GlideException e, Object model, Target target, boolean isFirstResource) {
-                        largeImageLoadingLayout.setVisibility(View.GONE);
-                        return false;
-                    }
+                            @Override
+                            public boolean onResourceReady(Object resource, Object model, Target target, DataSource dataSource, boolean isFirstResource) {
+                                largeImageLoadingLayout.setVisibility(View.GONE);
+//                        expandedImageView.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                                return false;
+                            }
+                        }).apply(options).into(expandedImageView);
 
-                    @Override
-                    public boolean onResourceReady(Object resource, Object model, Target target, DataSource dataSource, boolean isFirstResource) {
-                        largeImageLoadingLayout.setVisibility(View.GONE);
-                        return false;
-                    }
-                }).apply(options).into(expandedImageView);
-
+//        expandedImageView.setLayoutParams(new RelativeLayout.LayoutParams(100,100));
 
         // Load the high-resolution "zoomed-in" image.
 //        final ImageView expandedImageView = (ImageView) findViewById(
@@ -327,6 +332,7 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
         expandedImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                expandedImageView.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 expandedImageMask.setVisibility(View.GONE);
                 largeImageLoadingLayout.setVisibility(View.GONE);
                 if (currentAnimator != null) {
