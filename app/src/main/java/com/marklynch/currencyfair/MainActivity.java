@@ -9,17 +9,15 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.RelativeLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -29,18 +27,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.marklynch.currencyfair.ui.main.ImageToDisplay;
 import com.marklynch.currencyfair.ui.main.ImagesAdapter;
 import com.marklynch.currencyfair.ui.main.MainViewModel;
+
+import java.net.URL;
 
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements ImagesAdapter.ImageZoomer {
 
     private MainViewModel viewModel;
-    private SwipeRefreshLayout swipeRefreshLayout;
+//    private SwipeRefreshLayout swipeRefreshLayout;
 
     private static int actionBarHeightPixels;//56dp
 
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
 
     private Animator currentAnimator;
     private int shortAnimationDuration;
+
+    private RelativeLayout loadingLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +74,9 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
+
+        //Loading animation
+        loadingLayout = findViewById(R.id.loading);
 
         //Animation
         shortAnimationDuration = getResources().getInteger(
@@ -92,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
                 currentSearchQuery = query;
                 viewModel.retrieveSearchResults(currentSearchQuery, currentPage, true);
                 loading = true;
-                swipeRefreshLayout.setRefreshing(true);
+                loadingLayout.setVisibility(View.VISIBLE);
                 return true;
             }
 
@@ -122,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
                     Timber.d("INFINITE currentScroll = " + currentScroll);
                     Timber.d("INFINITE maxScroll - currentScroll = " + (maxScroll - currentScroll));
                     loading = true;
-                    Toast.makeText(MainActivity.this, "LOADING", Toast.LENGTH_LONG).show();
+                    loadingLayout.setVisibility(View.VISIBLE);
                     viewModel.retrieveSearchResults(currentSearchQuery, ++currentPage, false);
                 }
             }
@@ -145,9 +153,9 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
 //        }
 
         //Swipe refresh
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setEnabled(false);
-        swipeRefreshLayout.setProgressViewOffset(true, 0, 256);
+//        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+//        swipeRefreshLayout.setEnabled(false);
+//        swipeRefreshLayout.setProgressViewOffset(true, 0, 256);
 
         // Observer photos livedata
         viewModel.photoUrls.observe(this,
@@ -155,41 +163,9 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
                 {
                     Timber.d("OBSERVE");
                     loading = false;
-                    swipeRefreshLayout.setRefreshing(false);
+                    loadingLayout.setVisibility(View.GONE);
                     recyclerViewAdapter.setImagesToDisplay(photoUrls);
                 });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        return true;
-
-//        // Inflate the options menu from XML
-//        MenuInflater inflater = getMenuInflater();
-//        inflater.inflate(R.menu.main_menu, menu);
-//
-//        //Sackoverflow
-//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//        SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
-//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                searchRequest(query);
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String query) {
-//                searchRequest(query);
-//                return true;
-//            }
-//        });
-//        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-//
-//        return true;
     }
 
     public void hideKeyboard() {
@@ -205,12 +181,12 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
     private static RequestOptions options = new RequestOptions().centerInside();
 
     public void zoomImageFromThumb(final ImageView thumbView, ImageToDisplay imageToDisplay) {
+        loadingLayout.setVisibility(View.VISIBLE);
         // If there's an animation in progress, cancel it
         // immediately and proceed with this one.
         if (currentAnimator != null) {
             currentAnimator.cancel();
         }
-
 
 
         final ImageView expandedImageView = findViewById(
@@ -221,8 +197,21 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
 
         RequestOptions options = new RequestOptions().placeholder(thumbView.getDrawable());
 
-        Glide.with(getApplication()).load(imageToDisplay.largeImageUrl).apply(options).into(expandedImageView);
+        Glide.with(getApplication()).load(imageToDisplay.largeImageUrl).listener(
 
+                new RequestListener() {
+                    @Override
+                    public boolean onLoadFailed(GlideException e, Object model, Target target, boolean isFirstResource) {
+                        loadingLayout.setVisibility(View.GONE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Object resource, Object model, Target target, DataSource dataSource, boolean isFirstResource) {
+                        loadingLayout.setVisibility(View.GONE);
+                        return false;
+                    }
+                }).apply(options).into(expandedImageView);
 
 
         // Load the high-resolution "zoomed-in" image.
