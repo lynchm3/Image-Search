@@ -57,6 +57,9 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
     private RelativeLayout expandedImageMask;
     private boolean hidingSearchView = false;
 
+
+    ImageView expandedImageView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +78,10 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
+
+
+        expandedImageView = findViewById(
+                R.id.expanded_image);
 
         //Loading animations
         searchLoading = findViewById(R.id.search_loading);
@@ -130,8 +137,7 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
                 if (!hidingSearchView && dy > 10) {
                     searchView.animate().translationY(-200);
                     hidingSearchView = true;
-                }
-                else if (hidingSearchView && dy < -10) {
+                } else if (hidingSearchView && dy < -10) {
                     searchView.animate().translationY(0);
                     hidingSearchView = false;
                 }
@@ -207,10 +213,6 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
         if (currentAnimator != null) {
             currentAnimator.cancel();
         }
-
-
-        final ImageView expandedImageView = findViewById(
-                R.id.expanded_image);
 
 //        expandedImageView.setImageBitmap(thumbView.getDrawable());
 
@@ -366,5 +368,13 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
                 currentAnimator = set;
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (expandedImageView.getVisibility() == View.VISIBLE)
+            expandedImageView.callOnClick();
+        else
+            super.onBackPressed();
     }
 }
