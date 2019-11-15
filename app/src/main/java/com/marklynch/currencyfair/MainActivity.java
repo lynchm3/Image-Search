@@ -22,8 +22,6 @@ import android.widget.RelativeLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -57,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
     private RelativeLayout scrollLoadingLayout;
     private RelativeLayout largeImageLoadingLayout;
     private RelativeLayout expandedImageMask;
+    private boolean hidingSearchView = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +126,18 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
+                //SHow/Hide searchView
+                if (!hidingSearchView && dy > 10) {
+                    searchView.animate().translationY(-200);
+                    hidingSearchView = true;
+                }
+                else if (hidingSearchView && dy < -10) {
+                    searchView.animate().translationY(0);
+                    hidingSearchView = false;
+                }
+
+
+                //Load ahead if getting to end of images
                 int maxScroll = recyclerView.computeVerticalScrollRange();
                 int currentScroll = recyclerView.computeVerticalScrollOffset() + recyclerView.computeVerticalScrollExtent();
                 if (loading == false && maxScroll - currentScroll < 2000 && currentSearchQuery != null) {
