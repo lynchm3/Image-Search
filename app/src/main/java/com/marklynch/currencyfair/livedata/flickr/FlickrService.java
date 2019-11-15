@@ -6,12 +6,11 @@ import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.marklynch.currencyfair.livedata.flickr.data.FlickrGetSizesResponse;
 import com.marklynch.currencyfair.livedata.flickr.data.FlickrSearchResponse;
 import com.marklynch.currencyfair.livedata.flickr.data.Photo;
 import com.marklynch.currencyfair.livedata.flickr.data.Size;
+import com.marklynch.currencyfair.ui.main.ImageToDisplay;
 import com.readystatesoftware.chuck.ChuckInterceptor;
 
 import java.util.List;
@@ -56,29 +55,28 @@ public class FlickrService {
         this.apiService = retrofit.create(FlickrSearchService.class);
     }
 
-    public void getPhotoUrlsFromSearchTerm(final String query, final MutableLiveData<List<String>> liveData, int page, Application application) {
+    public void getPhotoUrlsFromSearchTerm(final String query, final MutableLiveData<List<ImageToDisplay>> liveData, int page, Application application) {
 
         final int[] count = {0};
-        final List<String> urls = liveData.getValue();
+        final List<ImageToDisplay> imagesToDisplay = liveData.getValue();
 
         Callback<FlickrGetSizesResponse> getSizesRequestCallback = new Callback<FlickrGetSizesResponse>() {
             @Override
             public void onResponse(Call<FlickrGetSizesResponse> call, Response<FlickrGetSizesResponse> response) {
 
-                String newUrl = getUrlAtPreferredSize(response.body());
+                ImageToDisplay imageToDisplay = getImageToDisplay(response.body());
 
-                Glide.with(application).load(newUrl).submit();
+                if (imageToDisplay != null && imageToDisplay.thumbnailUrl != null)
+                    Glide.with(application).load(imageToDisplay.thumbnailUrl).submit();
 
                 synchronized (liveData) {
-                    if (!urls.contains(newUrl))
-                        urls.add(newUrl);
-
+                    if (imageToDisplay != null && imageToDisplay.thumbnailUrl != null)
+                        imagesToDisplay.add(imageToDisplay);
 
                     count[0]++;
                     if (count[0] % PER_PAGE == 0) {
-
                         Timber.d("Calling postvalue a, count == " + count[0]);
-                        liveData.postValue(urls);
+                        liveData.postValue(imagesToDisplay);
                     }
                 }
             }
@@ -89,7 +87,7 @@ public class FlickrService {
                     count[0]++;
                     if (count[0] % PER_PAGE == 0) {
                         Timber.d("Calling postvalue b, count == " + count[0]);
-                        liveData.postValue(urls);
+                        liveData.postValue(imagesToDisplay);
                     }
                 }
             }
@@ -119,24 +117,26 @@ public class FlickrService {
         apiService.getSizes(GET_SIZES_METHOD_VALUE, API_KEY_VALUE, photo.id, FORMAT_JSON, NO_JSON_CALLBACK).enqueue(callback);
     }
 
-    private final String[] preferredSizes = {
-            "Large Square"
-    };
-
-    public String getUrlAtPreferredSize(FlickrGetSizesResponse flickrGetSizesResponse) {
+    public ImageToDisplay getImageToDisplay(FlickrGetSizesResponse flickrGetSizesResponse) {
         if (flickrGetSizesResponse == null || flickrGetSizesResponse.sizes == null || flickrGetSizesResponse.sizes.size == null)
             return null;
 
         List<Size> sizesFromResponse = flickrGetSizesResponse.sizes.size;
+        String thumbnailUrl = "";
+        String largeImageUrl = "";
 
-        for (String preferredSize : preferredSizes) {
-            for (Size sizeFromResponse : sizesFromResponse) {
-                if (preferredSize.equals(sizeFromResponse.label)) {
-                    return sizeFromResponse.source;
-                }
+        for (Size sizeFromResponse : sizesFromResponse) {
+            if ("Large Square".equals(sizeFromResponse.label)) {
+                thumbnailUrl = sizeFromResponse.source;
+            } else if ("Large".equals(sizeFromResponse.label)) {
+                largeImageUrl = sizeFromResponse.source;
             }
         }
-        return null;
+
+        if(largeImageUrl == null)
+            largeImageUrl = thumbnailUrl;
+
+        return new ImageToDisplay(thumbnailUrl, largeImageUrl);
     }
 
     private Retrofit getRetrofitInstance(String baseUrl, Context context) {

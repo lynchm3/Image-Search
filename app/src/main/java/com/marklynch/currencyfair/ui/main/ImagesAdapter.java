@@ -17,22 +17,22 @@ import com.marklynch.currencyfair.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
-
 
 public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewHolder> {
 
     private Activity activity;
     private LayoutInflater mInflater;
-    private List<String> photoUrls = new ArrayList<String>();
+    private List<ImageToDisplay> imagesToDisplay = new ArrayList<>();
     private int spaceAtTopInPixels;
 
     private static RequestOptions options = new RequestOptions()
             .centerCrop();
+    private ImageZoomer imageZoomer;
 
     public ImagesAdapter(
-            Activity activity) {
+            Activity activity, ImageZoomer imageZoomer) {
         this.activity = activity;
+        this.imageZoomer = imageZoomer;
         mInflater = LayoutInflater.from(activity);
 
         final float scale = activity.getResources().getDisplayMetrics().density;
@@ -60,25 +60,37 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
             holder.itemView.setLayoutParams(new ConstraintLayout.LayoutParams(spaceAtTopInPixels, spaceAtTopInPixels));
             holder.imageView.setVisibility(View.INVISIBLE);
         } else {
-            String url = photoUrls.get(position - 2);
+            String thumbUrl = imagesToDisplay.get(position - 2).thumbnailUrl;
             holder.itemView.setLayoutParams(new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             holder.imageView.setVisibility(View.VISIBLE);
-            Glide.with(activity).load(url).apply(options)
+            Glide.with(holder.imageView).load(thumbUrl).apply(options)
                     .transition(DrawableTransitionOptions.withCrossFade()).into(holder.imageView);
-            holder.imageView.setTag(R.id.url_tag, url);
+            holder.imageView.setTag(R.id.url_tag, thumbUrl);
+
+            holder.itemView.setOnClickListener(
+                    v -> imageZoomer.zoomImageFromThumb(holder.imageView, imagesToDisplay.get(position - 2))
+            );
+//
         }
     }
 
-    public void setPhotoUrls(List<String> photoUrls) {
-        this.photoUrls.clear();
-        this.photoUrls.addAll(photoUrls);
+    public void setImagesToDisplay(List<ImageToDisplay> imagesToDisplay) {
+        this.imagesToDisplay.clear();
+        this.imagesToDisplay.addAll(imagesToDisplay);
         notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return this.photoUrls.size() + 4;
+        return this.imagesToDisplay.size() + 4;
     }
+
+    public interface ImageZoomer
+    {
+        void zoomImageFromThumb(final ImageView thumbView, ImageToDisplay imageToDisplay);
+    }
+
+
 }
 
 

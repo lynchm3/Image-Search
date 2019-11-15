@@ -11,6 +11,7 @@
     <!--        tools:context=".MainActivity">-->
 
     <RelativeLayout
+        android:id="@+id/frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FFFFFF">
@@ -54,10 +55,25 @@
             bind:mainViewModel="@{mainViewModel}" />
 
         <RelativeLayout
+            android:id="@+id/navigation_bar"
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:layout_alignParentBottom="true"
             android:background="#DDFFFFFF" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/status_bar"
+            android:layout_above="@id/navigation_bar">
+
+        <ImageView
+            android:id="@+id/expanded_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            />
+        </RelativeLayout>
 
     </RelativeLayout>
 

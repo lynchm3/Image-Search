@@ -14,7 +14,7 @@ import java.util.List;
 public class MainViewModel extends AndroidViewModel {
 
     public FlickrService flickrService;
-    public MutableLiveData<List<String>> photoUrls = new MutableLiveData<>(new ArrayList<>());
+    public MutableLiveData<List<ImageToDisplay>> photoUrls = new MutableLiveData<>(new ArrayList<>());
 
     public MainViewModel(Application application) {
         super(application);
