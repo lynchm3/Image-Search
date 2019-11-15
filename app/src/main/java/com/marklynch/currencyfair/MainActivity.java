@@ -22,9 +22,10 @@ import android.widget.RelativeLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -35,8 +36,6 @@ import com.bumptech.glide.request.target.Target;
 import com.marklynch.currencyfair.ui.main.ImageToDisplay;
 import com.marklynch.currencyfair.ui.main.ImagesAdapter;
 import com.marklynch.currencyfair.ui.main.MainViewModel;
-
-import java.net.URL;
 
 import timber.log.Timber;
 
@@ -54,7 +53,10 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
     private Animator currentAnimator;
     private int shortAnimationDuration;
 
-    private RelativeLayout loadingLayout;
+    private RelativeLayout searchLoading;
+    private RelativeLayout scrollLoadingLayout;
+    private RelativeLayout largeImageLoadingLayout;
+    private RelativeLayout expandedImageMask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +77,11 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
 
-        //Loading animation
-        loadingLayout = findViewById(R.id.loading);
+        //Loading animations
+        searchLoading = findViewById(R.id.search_loading);
+        scrollLoadingLayout = findViewById(R.id.scroll_loading);
+        largeImageLoadingLayout = findViewById(R.id.large_image_loading);
+        expandedImageMask = findViewById(R.id.expanded_image_mask);
 
         //Animation
         shortAnimationDuration = getResources().getInteger(
@@ -100,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
                 currentSearchQuery = query;
                 viewModel.retrieveSearchResults(currentSearchQuery, currentPage, true);
                 loading = true;
-                loadingLayout.setVisibility(View.VISIBLE);
+                searchLoading.setVisibility(View.VISIBLE);
                 return true;
             }
 
@@ -130,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
                     Timber.d("INFINITE currentScroll = " + currentScroll);
                     Timber.d("INFINITE maxScroll - currentScroll = " + (maxScroll - currentScroll));
                     loading = true;
-                    loadingLayout.setVisibility(View.VISIBLE);
+                    scrollLoadingLayout.setVisibility(View.VISIBLE);
                     viewModel.retrieveSearchResults(currentSearchQuery, ++currentPage, false);
                 }
             }
@@ -163,9 +168,12 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
                 {
                     Timber.d("OBSERVE");
                     loading = false;
-                    loadingLayout.setVisibility(View.GONE);
+                    searchLoading.setVisibility(View.GONE);
+                    scrollLoadingLayout.setVisibility(View.GONE);
                     recyclerViewAdapter.setImagesToDisplay(photoUrls);
                 });
+
+        searchView.requestFocus();
     }
 
     public void hideKeyboard() {
@@ -181,7 +189,8 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
     private static RequestOptions options = new RequestOptions().centerInside();
 
     public void zoomImageFromThumb(final ImageView thumbView, ImageToDisplay imageToDisplay) {
-        loadingLayout.setVisibility(View.VISIBLE);
+        largeImageLoadingLayout.setVisibility(View.VISIBLE);
+        expandedImageMask.setVisibility(View.VISIBLE);
         // If there's an animation in progress, cancel it
         // immediately and proceed with this one.
         if (currentAnimator != null) {
@@ -202,13 +211,13 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
                 new RequestListener() {
                     @Override
                     public boolean onLoadFailed(GlideException e, Object model, Target target, boolean isFirstResource) {
-                        loadingLayout.setVisibility(View.GONE);
+                        largeImageLoadingLayout.setVisibility(View.GONE);
                         return false;
                     }
 
                     @Override
                     public boolean onResourceReady(Object resource, Object model, Target target, DataSource dataSource, boolean isFirstResource) {
-                        loadingLayout.setVisibility(View.GONE);
+                        largeImageLoadingLayout.setVisibility(View.GONE);
                         return false;
                     }
                 }).apply(options).into(expandedImageView);
@@ -305,6 +314,8 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
         expandedImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                expandedImageMask.setVisibility(View.GONE);
+                largeImageLoadingLayout.setVisibility(View.GONE);
                 if (currentAnimator != null) {
                     currentAnimator.cancel();
                 }

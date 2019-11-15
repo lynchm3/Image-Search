@@ -57,25 +57,72 @@
             android:layout_below="@id/status_bar"
             android:layout_above="@id/navigation_bar">
 
+            <RelativeLayout
+                android:id="@+id/expanded_image_mask"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:background="#FFFFFFFF"/>
+
             <ImageView
                 android:id="@+id/expanded_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="invisible"
-                />
+                android:visibility="invisible"/>
+
+            <RelativeLayout
+                android:id="@+id/large_image_loading"
+                android:background="@drawable/circle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="gone"
+                >
+<!--                android:layout_alignBottom="@id/expanded_image"-->
+<!--                android:layout_alignEnd="@id/expanded_image"-->
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleSmall"
+                    android:indeterminate="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminateTint="#88000000"
+                    android:indeterminateTintMode="src_in"/>
+
+            </RelativeLayout>
         </RelativeLayout>
 
 
 
         <RelativeLayout
-            android:id="@+id/loading"
+            android:id="@+id/search_loading"
+            android:background="@drawable/circle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone">
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleSmall"
+                android:indeterminate="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminateTint="#88000000"
+                android:indeterminateTintMode="src_in"/>
+
+        </RelativeLayout>
+
+
+
+        <RelativeLayout
+            android:id="@+id/scroll_loading"
             android:background="@drawable/circle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="60dp"
             android:layout_marginEnd="8dp"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
+            android:layout_centerHorizontal="true"
             android:visibility="gone"
             >
 
@@ -85,9 +132,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:indeterminateTint="#88000000"
-                android:indeterminateTintMode="src_in"
-
-                />
+                android:indeterminateTintMode="src_in"/>
 
         </RelativeLayout>
 
