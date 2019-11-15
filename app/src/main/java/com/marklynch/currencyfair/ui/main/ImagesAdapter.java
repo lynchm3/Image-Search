@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.marklynch.currencyfair.R;
 
@@ -64,7 +65,8 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
         } else {
             holder.itemView.setLayoutParams(new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             holder.imageView.setVisibility(View.VISIBLE);
-            Glide.with(activity).load(photoUrls.get(position)).apply(options).into(holder.imageView);
+            Glide.with(activity).load(photoUrls.get(position)).apply(options)
+                    .transition(DrawableTransitionOptions.withCrossFade()).into(holder.imageView);
         }
     }
 

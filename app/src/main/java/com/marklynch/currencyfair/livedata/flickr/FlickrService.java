@@ -10,25 +10,17 @@ import com.marklynch.currencyfair.livedata.flickr.data.Photo;
 import com.marklynch.currencyfair.livedata.flickr.data.Size;
 import com.readystatesoftware.chuck.ChuckInterceptor;
 
-import org.reactivestreams.Subscriber;
-
 import java.io.IOException;
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import timber.log.Timber;
 
 public class FlickrService {
 
@@ -60,59 +52,49 @@ public class FlickrService {
         this.apiService = retrofit.create(FlickrSearchService.class);
     }
 
-    public void getPhotoUrlsFromSearchTerm(String query, MutableLiveData<List<String>> callback) throws IOException {
-        //START THREAD
-        Timber.d("getPhotoUrlsFromSearchTerm");
-        getPhotoUrls(query)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<String>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        Timber.d("onSubscribe");
-                    }
+    public void getPhotoUrlsFromSearchTerm(String query, MutableLiveData<List<String>> liveData) throws IOException {
 
-                    @Override
-                    public void onNext(String url) {
-                        List<String> urls = callback.getValue();
-                        if (!urls.contains(url)) {
-                            urls.add(url);
-                            callback.postValue(urls);
-                        }
-                    }
+        Callback<FlickrGetSizesResponse> getSizesRequestCallback = new Callback<FlickrGetSizesResponse>() {
+            @Override
+            public void onResponse(Call<FlickrGetSizesResponse> call, Response<FlickrGetSizesResponse> response) {
+                String newUrl = getUrlAtPreferredSize(response.body());
+                List<String> urls = liveData.getValue();
+                if (!urls.contains(newUrl)) {
+                    urls.add(newUrl);
+                    liveData.postValue(urls);
+                }
+            }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.e(e);
-                    }
+            @Override public void onFailure(Call<FlickrGetSizesResponse> call, Throwable t) {}
+        };
 
-                    @Override
-                    public void onComplete() {
+        Callback<FlickrSearchResponse> searchRequestCallback = new Callback<FlickrSearchResponse>() {
+            @Override
+            public void onResponse(Call<FlickrSearchResponse> call, Response<FlickrSearchResponse> response) {
+                for (Photo photo : response.body().photos.photo) {
+                    getSizesRequest(photo, getSizesRequestCallback);
+                }
+            }
 
-                    }
-                });
+            @Override public void onFailure(Call<FlickrSearchResponse> call, Throwable t) {}
+        };
+
+        searchRequest(query,searchRequestCallback);
+    }
+
+    private void searchRequest(String query, Callback<FlickrSearchResponse> callback){
+        apiService.search(SEARCH_METHOD_VALUE, API_KEY_VALUE, query, 1, FORMAT_JSON, NO_JSON_CALLBACK, PER_PAGE_VALUE).enqueue(callback);
+    }
+
+    private void getSizesRequest(Photo photo, Callback<FlickrGetSizesResponse> callback){
+        apiService.getSizes(GET_SIZES_METHOD_VALUE, API_KEY_VALUE, photo.id, FORMAT_JSON, NO_JSON_CALLBACK).enqueue(callback);
     }
 
     private final String[] preferredSizes = {
             "Large Square"
     };
 
-    public Observable<String> getPhotoUrls(String query) {
-        return Observable.create(s ->
-        {
-            Timber.d("inside the thread");
-            List<Photo> photos = searchRequest(query);
-            for (Photo photo : photos) {
-                FlickrGetSizesResponse flickrGetSizesResponse = getSizesRequest(photo);
-                String url = getUrlArPreferredSize(flickrGetSizesResponse);
-                if (url != null)
-                    s.onNext(url);
-            }
-            s.onComplete();
-        });
-    }
-
-    public String getUrlArPreferredSize(FlickrGetSizesResponse flickrGetSizesResponse) {
+    public String getUrlAtPreferredSize(FlickrGetSizesResponse flickrGetSizesResponse) {
         if (flickrGetSizesResponse == null || flickrGetSizesResponse.sizes == null || flickrGetSizesResponse.sizes.size == null)
             return null;
 
@@ -128,19 +110,6 @@ public class FlickrService {
         return null;
     }
 
-    public List<Photo> searchRequest(String query) throws IOException {
-        Call<FlickrSearchResponse> call = apiService.search(SEARCH_METHOD_VALUE, API_KEY_VALUE, query, 1, FORMAT_JSON, NO_JSON_CALLBACK, PER_PAGE_VALUE);
-        Response<FlickrSearchResponse> response = call.execute();
-        return response.body().photos.photo;
-    }
-
-    public FlickrGetSizesResponse getSizesRequest(Photo photo) throws IOException {
-        Call<FlickrGetSizesResponse> call = apiService.getSizes(GET_SIZES_METHOD_VALUE, API_KEY_VALUE, photo.id, FORMAT_JSON, NO_JSON_CALLBACK);
-        Response<FlickrGetSizesResponse> response = call.execute();
-
-        return response.body();
-    }
-
     private Retrofit getRetrofitInstance(String baseUrl, Context context) {
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new ChuckInterceptor(context)).build();
@@ -148,7 +117,6 @@ public class FlickrService {
         return new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .client(okHttpClient)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
     }
