@@ -39,8 +39,6 @@ import com.marklynch.currencyfair.ui.main.ImageToDisplay;
 import com.marklynch.currencyfair.ui.main.ImagesAdapter;
 import com.marklynch.currencyfair.ui.main.MainViewModel;
 
-import timber.log.Timber;
-
 public class MainActivity extends AppCompatActivity implements ImagesAdapter.ImageZoomer {
 
     private MainViewModel viewModel;
@@ -88,9 +86,9 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
                 R.id.expanded_image);
 
         //Loading animations
-        searchLoading = findViewById(R.id.search_loading);
-        scrollLoadingLayout = findViewById(R.id.scroll_loading);
-        largeImageLoadingLayout = findViewById(R.id.expanded_image_loading);
+        searchLoading = findViewById(R.id.search_progress_bar);
+        scrollLoadingLayout = findViewById(R.id.scroll_progress_bar);
+        largeImageLoadingLayout = findViewById(R.id.expanded_image_progress_bar);
         expandedImageMask = findViewById(R.id.expanded_image_mask);
 
         //Animation
@@ -146,11 +144,10 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
                     hidingSearchView = false;
                 }
 
-
                 //Load ahead if getting to end of images
                 int maxScroll = recyclerView.computeVerticalScrollRange();
                 int currentScroll = recyclerView.computeVerticalScrollOffset() + recyclerView.computeVerticalScrollExtent();
-                if (loading == false && dy < 0 && maxScroll - currentScroll < 2000 && currentSearchQuery != null) {
+                if (loading == false && dy > 0 && maxScroll - currentScroll < 2000 && currentSearchQuery != null) {
                     loading = true;
                     scrollLoadingLayout.setVisibility(View.VISIBLE);
                     viewModel.retrieveSearchResults(currentSearchQuery, ++currentPage, false);

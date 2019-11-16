@@ -1,27 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
-    <!--    <androidx.coordinatorlayout.widget.CoordinatorLayout-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent"-->
-    <!--        android:background="#000000"-->
-    <!--        tools:context=".MainActivity">-->
-
-    <RelativeLayout
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FFFFFF">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#FFFFFF"
-                android:clipToPadding="false"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FFFFFF"
+            android:clipToPadding="false"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <RelativeLayout
             android:id="@+id/status_bar"
@@ -30,18 +22,11 @@
             android:layout_alignParentTop="true"
             android:background="#DDFFFFFF" />
 
-
-        <!--        <RelativeLayout-->
-        <!--            android:id="@+id/container"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="match_parent"/>-->
-
         <include
             layout="@layout/main_action_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/status_bar"
-            bind:mainViewModel="@{mainViewModel}" />
+            android:layout_below="@id/status_bar" />
 
         <RelativeLayout
             android:id="@+id/navigation_bar"
@@ -78,80 +63,32 @@
                     android:visibility="invisible" />
             </RelativeLayout>
 
-            <RelativeLayout
-                android:id="@+id/expanded_image_loading"
-                android:background="@drawable/circle"
+
+            <include
+                layout="@layout/circle_progress_bar"
+                android:id="@+id/expanded_image_progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:visibility="gone"
-                >
-<!--                android:layout_alignBottom="@id/expanded_image"-->
-<!--                android:layout_alignEnd="@id/expanded_image"-->
-
-                <ProgressBar
-                    style="?android:attr/progressBarStyleSmall"
-                    android:indeterminate="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:indeterminateTint="#88000000"
-                    android:indeterminateTintMode="src_in"/>
-
-            </RelativeLayout>
+                android:visibility="gone"/>
         </RelativeLayout>
 
+    <include
+        layout="@layout/circle_progress_bar"
+        android:id="@+id/search_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
 
+    <include
+        layout="@layout/circle_progress_bar"
+        android:id="@+id/scroll_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"/>
 
-        <RelativeLayout
-            android:id="@+id/search_loading"
-            android:background="@drawable/circle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:visibility="gone">
-
-            <ProgressBar
-                style="?android:attr/progressBarStyleSmall"
-                android:indeterminate="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:indeterminateTint="#88000000"
-                android:indeterminateTintMode="src_in"/>
-
-        </RelativeLayout>
-
-
-
-        <RelativeLayout
-            android:id="@+id/scroll_loading"
-            android:background="@drawable/circle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="60dp"
-            android:layout_marginEnd="8dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:visibility="gone"
-            >
-
-            <ProgressBar
-                style="?android:attr/progressBarStyleSmall"
-                android:indeterminate="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:indeterminateTint="#88000000"
-                android:indeterminateTintMode="src_in"/>
-
-        </RelativeLayout>
-
-    </RelativeLayout>
-
-    <!--    </androidx.coordinatorlayout.widget.CoordinatorLayout>-->
-
-    <data>
-
-        <variable
-            name="mainViewModel"
-            type="com.marklynch.currencyfair.ui.main.MainViewModel" />
-    </data>
-</layout>
+</RelativeLayout>
