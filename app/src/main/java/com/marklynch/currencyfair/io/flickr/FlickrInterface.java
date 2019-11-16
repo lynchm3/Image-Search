@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide;
 import com.marklynch.currencyfair.io.flickr.response.FlickrGetSizesResponse;
 import com.marklynch.currencyfair.io.flickr.response.FlickrSearchResponse;
 import com.marklynch.currencyfair.ui.main.ImageToDisplay;
+import com.marklynch.currencyfair.ui.main.ImagesToDisplay;
 import com.readystatesoftware.chuck.ChuckInterceptor;
 
 import org.jetbrains.annotations.NotNull;
@@ -86,10 +87,11 @@ public class FlickrInterface {
         flickrService.getSizes(API_KEY_VALUE, photo.id, FORMAT_JSON, NO_JSON_CALLBACK).enqueue(callback);
     }
 
-    public void getPhotoUrlsFromSearchTerm(final String query, final MutableLiveData<List<ImageToDisplay>> liveDataCallback, int page, Application application) {
+    public void getPhotoUrlsFromSearchTerm(final String query, final MutableLiveData<ImagesToDisplay> liveDataCallback, int page, Application application) {
+
 
         final int[] count = {0};
-        final List<ImageToDisplay> imagesToDisplay = liveDataCallback.getValue();
+        final ImagesToDisplay imagesToDisplay = liveDataCallback.getValue();
 
         Callback<FlickrGetSizesResponse> getSizesRequestCallback = new Callback<FlickrGetSizesResponse>() {
             @Override
@@ -104,7 +106,7 @@ public class FlickrInterface {
                 //Add image to our list, post to livedata callback if we have getSize responses for whole page
                 synchronized (liveDataCallback) {
                     if (imageToDisplay != null && imageToDisplay.thumb.source != null)
-                        imagesToDisplay.add(imageToDisplay);
+                        imagesToDisplay.images.add(imageToDisplay);
 
                     count[0]++;
                     if (count[0] % PER_PAGE == 0) {

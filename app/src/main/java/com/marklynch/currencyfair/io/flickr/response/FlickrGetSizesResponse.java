@@ -28,7 +28,7 @@ public class FlickrGetSizesResponse {
         public int canprint;
         @JsonProperty("candownload")
         public int candownload;
-        @JsonProperty("imageSize")
+        @JsonProperty("size")
         public List<ImageSize> imageSize = null;
 
         @Override

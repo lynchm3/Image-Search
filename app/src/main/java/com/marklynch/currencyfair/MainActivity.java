@@ -183,14 +183,15 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
 //        swipeRefreshLayout.setProgressViewOffset(true, 0, 256);
 
         // Observer photos livedata
-        viewModel.photoUrls.observe(this,
-                photoUrls ->
+        viewModel.imageToDisplayLiveData.observe(this,
+                imagesToDisplay ->
                 {
-                    Timber.d("OBSERVE");
+                    Timber.d("OBSERVE imagesToDisplay.images.size() = "
+                            + imagesToDisplay.images.size());
                     loading = false;
                     searchLoading.setVisibility(View.GONE);
                     scrollLoadingLayout.setVisibility(View.GONE);
-                    recyclerViewAdapter.setImagesToDisplay(photoUrls);
+                    recyclerViewAdapter.setImagesToDisplay(imagesToDisplay.images);
                 });
 
         searchView.requestFocus();
