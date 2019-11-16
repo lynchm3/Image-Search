@@ -3,6 +3,7 @@ package com.marklynch.currencyfair.io.flickr;
 import android.app.Application;
 
 import com.bumptech.glide.Glide;
+import com.marklynch.currencyfair.R;
 import com.marklynch.currencyfair.io.flickr.response.FlickrGetSizesResponse;
 import com.marklynch.currencyfair.io.flickr.response.FlickrSearchResponse;
 import com.marklynch.currencyfair.ui.main.ImageToDisplay;
@@ -19,7 +20,7 @@ import retrofit2.Response;
 
 public class QueryToImagesResolver {
 
-    public FlickrInterface flickrInterface;
+    private FlickrInterface flickrInterface;
 
     public QueryToImagesResolver(Application application) {
         flickrInterface = new FlickrInterface(application);
@@ -49,6 +50,8 @@ public class QueryToImagesResolver {
 
                 //Notify listener if we have received all pages
                 if (responseCounter.addAndGet(1) % FlickrInterface.PER_PAGE == 0) {
+                    if(imagesToDisplay.images.size() == 0)
+                        imagesToDisplay.errorMessage = R.string.error_loading_images;
                     listener.onNewImages(imagesToDisplay);
                 }
             }
@@ -57,6 +60,8 @@ public class QueryToImagesResolver {
             public void onFailure(@NotNull Call<FlickrGetSizesResponse> call, @NotNull Throwable t) {
                 //Post to livedata callback if we have getSize responses for whole page
                 if (responseCounter.addAndGet(1) % FlickrInterface.PER_PAGE == 0) {
+                    if(imagesToDisplay.images.size() == 0)
+                        imagesToDisplay.errorMessage = R.string.error_loading_images;
                     listener.onNewImages(imagesToDisplay);
                 }
             }
@@ -72,6 +77,8 @@ public class QueryToImagesResolver {
 
             @Override
             public void onFailure(@NotNull Call<FlickrSearchResponse> call, @NotNull Throwable t) {
+                imagesToDisplay.errorMessage = R.string.error_loading_images;
+                listener.onNewImages(imagesToDisplay);
             }
         };
 

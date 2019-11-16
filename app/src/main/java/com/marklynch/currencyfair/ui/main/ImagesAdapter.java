@@ -73,9 +73,9 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
         }
     }
 
-    public void setImagesToDisplay(List<ImageToDisplay> imagesToDisplay) {
+    public void setImagesToDisplay(ImagesToDisplay imagesToDisplay) {
         this.imagesToDisplay.clear();
-        this.imagesToDisplay.addAll(imagesToDisplay);
+        this.imagesToDisplay.addAll(imagesToDisplay.images);
         notifyDataSetChanged();
     }
 

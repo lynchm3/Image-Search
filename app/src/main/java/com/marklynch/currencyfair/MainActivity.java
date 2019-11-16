@@ -20,6 +20,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -149,11 +150,7 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
                 //Load ahead if getting to end of images
                 int maxScroll = recyclerView.computeVerticalScrollRange();
                 int currentScroll = recyclerView.computeVerticalScrollOffset() + recyclerView.computeVerticalScrollExtent();
-                if (loading == false && maxScroll - currentScroll < 2000 && currentSearchQuery != null) {
-                    Timber.d("INFINITE");
-                    Timber.d("INFINITE maxScroll = " + maxScroll);
-                    Timber.d("INFINITE currentScroll = " + currentScroll);
-                    Timber.d("INFINITE maxScroll - currentScroll = " + (maxScroll - currentScroll));
+                if (loading == false && dy < 0 && maxScroll - currentScroll < 2000 && currentSearchQuery != null) {
                     loading = true;
                     scrollLoadingLayout.setVisibility(View.VISIBLE);
                     viewModel.retrieveSearchResults(currentSearchQuery, ++currentPage, false);
@@ -186,12 +183,12 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
         viewModel.imageToDisplayLiveData.observe(this,
                 imagesToDisplay ->
                 {
-                    Timber.d("OBSERVE imagesToDisplay.images.size() = "
-                            + imagesToDisplay.images.size());
                     loading = false;
                     searchLoading.setVisibility(View.GONE);
                     scrollLoadingLayout.setVisibility(View.GONE);
-                    recyclerViewAdapter.setImagesToDisplay(imagesToDisplay.images);
+                    if(imagesToDisplay.errorMessage != -1)
+                        Toast.makeText(getApplicationContext(), getString(imagesToDisplay.errorMessage), Toast.LENGTH_SHORT).show();
+                    recyclerViewAdapter.setImagesToDisplay(imagesToDisplay);
                 });
 
         searchView.requestFocus();
