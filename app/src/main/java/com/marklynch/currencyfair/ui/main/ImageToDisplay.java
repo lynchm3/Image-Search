@@ -1,11 +1,11 @@
 package com.marklynch.currencyfair.ui.main;
 
-import com.marklynch.currencyfair.livedata.flickr.data.Size;
+import com.marklynch.currencyfair.io.flickr.response.FlickrGetSizesResponse;
 
 public class ImageToDisplay {
 
-    public Size thumb;
-    public Size large;
+    public FlickrGetSizesResponse.ImageSize thumb;
+    public FlickrGetSizesResponse.ImageSize large;
 
 //    public String thumbnailUrl;
 //    public String largeImageUrl;

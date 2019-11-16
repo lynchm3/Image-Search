@@ -1,4 +1,4 @@
-package com.marklynch.currencyfair.livedata.network;
+package com.marklynch.currencyfair.network;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

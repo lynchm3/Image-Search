@@ -33,7 +33,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
-import com.marklynch.currencyfair.livedata.flickr.data.Size;
+import com.marklynch.currencyfair.io.flickr.response.FlickrGetSizesResponse;
 import com.marklynch.currencyfair.ui.main.ImageToDisplay;
 import com.marklynch.currencyfair.ui.main.ImagesAdapter;
 import com.marklynch.currencyfair.ui.main.MainViewModel;
@@ -228,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screenWidth = displayMetrics.widthPixels;
         int screenHeight = displayMetrics.heightPixels;
-        Size large = imageToDisplay.large;
+        FlickrGetSizesResponse.ImageSize large = imageToDisplay.large;
         if (large.width > large.height) {
             float ratio = (float) large.height / (float) large.width;
             float widthToDrawAt = screenWidth * ratio;

@@ -5,15 +5,15 @@ import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.marklynch.currencyfair.livedata.flickr.FlickrService;
-import com.marklynch.currencyfair.livedata.network.NetworkInfoLiveData;
+import com.marklynch.currencyfair.io.flickr.FlickrInterface;
+import com.marklynch.currencyfair.network.NetworkInfoLiveData;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainViewModel extends AndroidViewModel {
 
-    public FlickrService flickrService;
+    public FlickrInterface flickrInterface;
     public MutableLiveData<List<ImageToDisplay>> photoUrls = new MutableLiveData<>(new ArrayList<>());
 
     public MainViewModel(Application application) {
@@ -21,7 +21,7 @@ public class MainViewModel extends AndroidViewModel {
 
         photoUrls.setValue(new ArrayList<>());
 
-        flickrService = new FlickrService(application);
+        flickrInterface = new FlickrInterface(application);
 
         //Internet Connection
         NetworkInfoLiveData networkInfoLiveData;
@@ -30,7 +30,7 @@ public class MainViewModel extends AndroidViewModel {
     public void retrieveSearchResults(String query, int page, boolean newSearch) {
         if (newSearch)
             photoUrls.setValue(new ArrayList<>());
-        flickrService.getPhotoUrlsFromSearchTerm(query, photoUrls, page, getApplication());
+        flickrInterface.getPhotoUrlsFromSearchTerm(query, photoUrls, page, getApplication());
     }
 
 }
