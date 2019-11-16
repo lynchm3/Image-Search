@@ -11,7 +11,9 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
@@ -31,6 +33,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
+import com.marklynch.currencyfair.livedata.flickr.data.Size;
 import com.marklynch.currencyfair.ui.main.ImageToDisplay;
 import com.marklynch.currencyfair.ui.main.ImagesAdapter;
 import com.marklynch.currencyfair.ui.main.MainViewModel;
@@ -86,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
         //Loading animations
         searchLoading = findViewById(R.id.search_loading);
         scrollLoadingLayout = findViewById(R.id.scroll_loading);
-        largeImageLoadingLayout = findViewById(R.id.large_image_loading);
+        largeImageLoadingLayout = findViewById(R.id.expanded_image_loading);
         expandedImageMask = findViewById(R.id.expanded_image_mask);
 
         //Animation
@@ -216,30 +219,43 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
 
 //        expandedImageView.setImageBitmap(thumbView.getDrawable());
 
+        //CALCULATE WHERE AND WHAT SIZE TO DRAW THE THUMB
+        //Do it simple first assume portrait phone
+        //Assume portrait photo OK
 
-        RequestOptions options = new RequestOptions();//.placeholder(thumbView.getDrawable());
+        RelativeLayout expandedImageHolder = findViewById(R.id.expanded_image_holder);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screenWidth = displayMetrics.widthPixels;
+        int screenHeight = displayMetrics.heightPixels;
+        Size large = imageToDisplay.large;
+        if (large.width > large.height) {
+            float ratio = (float) large.height / (float) large.width;
+            float widthToDrawAt = screenWidth * ratio;
+            expandedImageHolder.getLayoutParams().width = (int) widthToDrawAt;
+        }
+
+        RequestOptions options = new RequestOptions().placeholder(thumbView.getDrawable());
 
         Glide.with(getApplication())
                 .load(imageToDisplay.large.source)
-                .thumbnail(Glide.with(getApplication()).load(imageToDisplay.thumb.source))
                 .listener(
                         new RequestListener() {
                             @Override
                             public boolean onLoadFailed(GlideException e, Object model, Target target, boolean isFirstResource) {
                                 largeImageLoadingLayout.setVisibility(View.GONE);
-//                        expandedImageView.setLayoutParams(new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                                expandedImageHolder.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
                                 return false;
                             }
 
                             @Override
                             public boolean onResourceReady(Object resource, Object model, Target target, DataSource dataSource, boolean isFirstResource) {
                                 largeImageLoadingLayout.setVisibility(View.GONE);
-//                        expandedImageView.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                                expandedImageHolder.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
                                 return false;
                             }
                         }).apply(options).into(expandedImageView);
 
-//        expandedImageView.setLayoutParams(new RelativeLayout.LayoutParams(100,100));
 
         // Load the high-resolution "zoomed-in" image.
 //        final ImageView expandedImageView = (ImageView) findViewById(
@@ -332,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements ImagesAdapter.Ima
         expandedImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                expandedImageView.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                expandedImageHolder.getLayoutParams().width = ViewGroup.LayoutParams.MATCH_PARENT;
                 expandedImageMask.setVisibility(View.GONE);
                 largeImageLoadingLayout.setVisibility(View.GONE);
                 if (currentAnimator != null) {
