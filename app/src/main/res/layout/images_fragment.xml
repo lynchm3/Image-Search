@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frame"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.main.ImagesFragment">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <RelativeLayout
+        android:id="@+id/expanded_image_area"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="26dp"
+        android:layout_marginBottom="52dp">
+
+        <RelativeLayout
+            android:id="@+id/expanded_image_mask"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:background="#FFFFFFFF"/>
+
+
+        <RelativeLayout
+            android:id="@+id/expanded_image_holder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true">
+
+            <ImageView
+                android:id="@+id/expanded_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:visibility="invisible" />
+        </RelativeLayout>
+
+
+        <include
+            android:id="@+id/expanded_image_progress_bar"
+            layout="@layout/circle_progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone"/>
+    </RelativeLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
