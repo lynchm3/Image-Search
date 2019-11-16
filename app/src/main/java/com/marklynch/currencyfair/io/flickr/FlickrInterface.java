@@ -49,7 +49,7 @@ public class FlickrInterface {
     private static final String API_KEY_VALUE = "297af75d9d68977b69513409fc928ca8";
     private static final String FORMAT_JSON = "json";
     private static final int NO_JSON_CALLBACK = 1;
-    private static final int PER_PAGE = 20;
+    public static final int PER_PAGE = 20;
 
     public FlickrInterface(Context context) {
         this.flickrService = getRetrofitInstance(BASE_URL, context).create(FlickrService.class);
@@ -79,90 +79,11 @@ public class FlickrInterface {
                                               @Query(Fields.NO_JSON_CALLBACK) int noJsonCallback);
     }
 
-    private void searchRequest(String query, int page, Callback<FlickrSearchResponse> callback) {
+    public void searchRequest(String query, int page, Callback<FlickrSearchResponse> callback) {
         flickrService.search(API_KEY_VALUE, query, page, FORMAT_JSON, NO_JSON_CALLBACK, PER_PAGE).enqueue(callback);
     }
 
-    private void getSizesRequest(FlickrSearchResponse.Photo photo, Callback<FlickrGetSizesResponse> callback) {
+    public void getSizesRequest(FlickrSearchResponse.Photo photo, Callback<FlickrGetSizesResponse> callback) {
         flickrService.getSizes(API_KEY_VALUE, photo.id, FORMAT_JSON, NO_JSON_CALLBACK).enqueue(callback);
-    }
-
-    public void getPhotoUrlsFromSearchTerm(final String query, final MutableLiveData<ImagesToDisplay> liveDataCallback, int page, Application application) {
-
-
-        final int[] count = {0};
-        final ImagesToDisplay imagesToDisplay = liveDataCallback.getValue();
-
-        Callback<FlickrGetSizesResponse> getSizesRequestCallback = new Callback<FlickrGetSizesResponse>() {
-            @Override
-            public void onResponse(@NotNull Call<FlickrGetSizesResponse> call, Response<FlickrGetSizesResponse> response) {
-
-                ImageToDisplay imageToDisplay = getImageToDisplay(response.body());
-
-                //Queue up download of thumb image
-                if (imageToDisplay != null && imageToDisplay.thumb.source != null)
-                    Glide.with(application).load(imageToDisplay.thumb.source).submit();
-
-                //Add image to our list, post to livedata callback if we have getSize responses for whole page
-                synchronized (liveDataCallback) {
-                    if (imageToDisplay != null && imageToDisplay.thumb.source != null)
-                        imagesToDisplay.images.add(imageToDisplay);
-
-                    count[0]++;
-                    if (count[0] % PER_PAGE == 0) {
-                        liveDataCallback.postValue(imagesToDisplay);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(@NotNull Call<FlickrGetSizesResponse> call, @NotNull Throwable t) {
-                //Post to livedata callback if we have getSize responses for whole page
-                synchronized (liveDataCallback) {
-                    count[0]++;
-                    if (count[0] % PER_PAGE == 0) {
-                        liveDataCallback.postValue(imagesToDisplay);
-                    }
-                }
-            }
-        };
-
-        Callback<FlickrSearchResponse> searchRequestCallback = new Callback<FlickrSearchResponse>() {
-            @Override
-            public void onResponse(@NotNull Call<FlickrSearchResponse> call, Response<FlickrSearchResponse> response) {
-                for (FlickrSearchResponse.Photo photo : response.body().photos.photo) {
-                    getSizesRequest(photo, getSizesRequestCallback);
-                }
-            }
-
-            @Override
-            public void onFailure(@NotNull Call<FlickrSearchResponse> call, @NotNull Throwable t) {
-            }
-        };
-
-        searchRequest(query, page, searchRequestCallback);
-    }
-
-    private ImageToDisplay getImageToDisplay(FlickrGetSizesResponse flickrGetSizesResponse) {
-        if (flickrGetSizesResponse == null || flickrGetSizesResponse.sizes == null || flickrGetSizesResponse.sizes.imageSize == null)
-            return null;
-
-        ImageToDisplay imageToDisplay = new ImageToDisplay();
-        List<FlickrGetSizesResponse.ImageSize> sizesFromResponse = flickrGetSizesResponse.sizes.imageSize;
-        for (FlickrGetSizesResponse.ImageSize imageSizeFromResponse : sizesFromResponse) {
-            if ("Large Square".equals(imageSizeFromResponse.label)) {
-                imageToDisplay.thumb = imageSizeFromResponse;
-            } else if ("Large".equals(imageSizeFromResponse.label)) {
-                imageToDisplay.large = imageSizeFromResponse;
-            }
-        }
-
-        if (imageToDisplay.thumb == null)
-            return null;
-
-        if (imageToDisplay.large == null)
-            imageToDisplay.large = imageToDisplay.thumb;
-
-        return imageToDisplay;
     }
 }

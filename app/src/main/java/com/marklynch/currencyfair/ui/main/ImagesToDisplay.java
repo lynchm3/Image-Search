@@ -1,12 +1,11 @@
 package com.marklynch.currencyfair.ui.main;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Vector;
 
 public class ImagesToDisplay {
 
     public String errorMessage;
-    public List<ImageToDisplay> images = new ArrayList<>();
+    public Vector<ImageToDisplay> images = new Vector<>();
 
     @Override
     public String toString() {
