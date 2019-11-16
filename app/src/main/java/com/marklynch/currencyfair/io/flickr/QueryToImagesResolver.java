@@ -33,6 +33,7 @@ public class QueryToImagesResolver {
     public void getPhotoUrlsFromSearchTerm(final String query, QueryResultListener listener, int page, Application application) {
 
         final AtomicInteger responseCounter = new AtomicInteger(0);
+        final AtomicInteger totalImageCount = new AtomicInteger(0);
         final ImagesToDisplay imagesToDisplay = new ImagesToDisplay();
 
         Callback<FlickrGetSizesResponse> getSizesRequestCallback = new Callback<FlickrGetSizesResponse>() {
@@ -49,8 +50,8 @@ public class QueryToImagesResolver {
                 }
 
                 //Notify listener if we have received all pages
-                if (responseCounter.addAndGet(1) % FlickrInterface.PER_PAGE == 0) {
-                    if(imagesToDisplay.images.size() == 0)
+                if (responseCounter.incrementAndGet() % FlickrInterface.PER_PAGE == 0) {
+                    if (imagesToDisplay.images.size() == 0)
                         imagesToDisplay.errorMessage = R.string.error_loading_images;
                     listener.onNewImages(imagesToDisplay);
                 }
@@ -59,8 +60,8 @@ public class QueryToImagesResolver {
             @Override
             public void onFailure(@NotNull Call<FlickrGetSizesResponse> call, @NotNull Throwable t) {
                 //Post to livedata callback if we have getSize responses for whole page
-                if (responseCounter.addAndGet(1) % FlickrInterface.PER_PAGE == 0) {
-                    if(imagesToDisplay.images.size() == 0)
+                if (responseCounter.addAndGet(1) == totalImageCount.get()) {
+                    if (imagesToDisplay.images.size() == 0)
                         imagesToDisplay.errorMessage = R.string.error_loading_images;
                     listener.onNewImages(imagesToDisplay);
                 }
@@ -70,8 +71,17 @@ public class QueryToImagesResolver {
         Callback<FlickrSearchResponse> searchRequestCallback = new Callback<FlickrSearchResponse>() {
             @Override
             public void onResponse(@NotNull Call<FlickrSearchResponse> call, Response<FlickrSearchResponse> response) {
-                for (FlickrSearchResponse.Photo photo : response.body().photos.photo) {
-                    flickrInterface.getSizesRequest(photo, getSizesRequestCallback);
+                if (!response.isSuccessful() || response.body() == null) {
+                    imagesToDisplay.errorMessage = R.string.error_loading_images;
+                    listener.onNewImages(imagesToDisplay);
+                } else if (response.body().photos.photo.size() == 0) {
+                    imagesToDisplay.errorMessage = R.string.no_images_found;
+                    listener.onNewImages(imagesToDisplay);
+                } else {
+                    totalImageCount.set(response.body().photos.photo.size());
+                    for (FlickrSearchResponse.Photo photo : response.body().photos.photo) {
+                        flickrInterface.getSizesRequest(photo, getSizesRequestCallback);
+                    }
                 }
             }
 

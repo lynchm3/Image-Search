@@ -23,7 +23,7 @@
             android:background="#DDFFFFFF" />
 
         <include
-            layout="@layout/main_action_bar"
+            layout="@layout/search_action_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/status_bar" />
@@ -36,6 +36,7 @@
             android:background="#DDFFFFFF" />
 
         <RelativeLayout
+            android:id="@+id/expanded_image_area"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/status_bar"
@@ -65,8 +66,8 @@
 
 
             <include
-                layout="@layout/circle_progress_bar"
                 android:id="@+id/expanded_image_progress_bar"
+                layout="@layout/circle_progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -74,16 +75,16 @@
         </RelativeLayout>
 
     <include
-        layout="@layout/circle_progress_bar"
         android:id="@+id/search_progress_bar"
+        layout="@layout/circle_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:visibility="gone"/>
 
     <include
-        layout="@layout/circle_progress_bar"
         android:id="@+id/scroll_progress_bar"
+        layout="@layout/circle_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="60dp"
