@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Flickr Search</string>
 
+    <string name="query_hint">Search Flickr</string>
+
     <string name="error_loading_images">Error loading images</string>
     <string name="no_images_found">No images found</string>
 

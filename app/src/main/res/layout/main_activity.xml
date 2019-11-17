@@ -39,7 +39,7 @@
         android:visibility="gone"/>
 
     <include
-        android:id="@+id/scroll_progress_bar"
+        android:id="@+id/infinite_scroll_progress_bar"
         layout="@layout/circle_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

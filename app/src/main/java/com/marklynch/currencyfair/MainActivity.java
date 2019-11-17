@@ -1,8 +1,6 @@
 package com.marklynch.currencyfair;
 
 import android.app.Activity;
-import android.app.SearchManager;
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -30,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
     private String currentSearchQuery = null;
 
     private RelativeLayout searchProgressBar;
-    private RelativeLayout scrollProgressBar;
+    private RelativeLayout infiniteScrollProgressBar;
     private SearchView searchView;
 
 
@@ -48,13 +46,17 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
 
         //Progress bars
         searchProgressBar = findViewById(R.id.search_progress_bar);
-        scrollProgressBar = findViewById(R.id.scroll_progress_bar);
+        infiniteScrollProgressBar = findViewById(R.id.infinite_scroll_progress_bar);
 
         //Set colors for navigation and status bars
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            findViewById(R.id.navigation_bar).setBackgroundResource(R.color.black_translucent);
+        } else {
+            findViewById(R.id.status_bar).setBackgroundResource(R.color.black_translucent);
+            findViewById(R.id.navigation_bar).setBackgroundResource(R.color.black_translucent);
         }
 
         //Toolbar
@@ -64,8 +66,6 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
 
         //SearchView
         searchView = findViewById(R.id.search_view);
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
                 {
                     loading = false;
                     searchProgressBar.setVisibility(View.GONE);
-                    scrollProgressBar.setVisibility(View.GONE);
+                    infiniteScrollProgressBar.setVisibility(View.GONE);
 
                     if (imagesToDisplay.errorMessage != -1)
                         Toast.makeText(this, getString(imagesToDisplay.errorMessage), Toast.LENGTH_SHORT).show();
@@ -115,7 +115,9 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
         if (view == null) {
             view = new View(this);
         }
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     @Override
@@ -132,9 +134,9 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
         //Load ahead if getting to end of images
         int maxScroll = recyclerView.computeVerticalScrollRange();
         int currentScroll = recyclerView.computeVerticalScrollOffset() + recyclerView.computeVerticalScrollExtent();
-        if (loading == false && dy > 0 && maxScroll - currentScroll < 2000 && currentSearchQuery != null) {
+        if (!loading && dy > 0 && maxScroll - currentScroll < 4000 && currentSearchQuery != null) {
             loading = true;
-            scrollProgressBar.setVisibility(View.VISIBLE);
+            infiniteScrollProgressBar.setVisibility(View.VISIBLE);
             viewModel.retrieveSearchResults(currentSearchQuery, ++currentPage, false);
         }
     }
