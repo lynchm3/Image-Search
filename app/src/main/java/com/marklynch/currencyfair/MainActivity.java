@@ -31,8 +31,12 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
     private RelativeLayout infiniteScrollProgressBar;
     private SearchView searchView;
 
-
     private MainViewModel viewModel;
+
+    Toolbar toolbar;
+
+    private enum SCROLL_DIRECTION {NONE, UP, DOWN}
+    private static final int SCROLL_REMAINING_WHEN_LOAD_NEXT_PAGE = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
         }
 
         //Toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
+         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
 
@@ -109,6 +113,16 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
         searchView.requestFocus();
     }
 
+    public void hideSearchView() {
+        toolbar.animate().translationY(-200);
+        hidingSearchView = true;
+    }
+
+    public void showSearchView() {
+        toolbar.animate().translationY(0);
+        hidingSearchView = false;
+    }
+
     public void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
         View view = this.getCurrentFocus();
@@ -122,23 +136,33 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
 
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-        //SHow/Hide searchView
-        if (!hidingSearchView && dy > 10) {
-            searchView.animate().translationY(-200);
-            hidingSearchView = true;
-        } else if (hidingSearchView && dy < -10) {
-            searchView.animate().translationY(0);
-            hidingSearchView = false;
+
+        SCROLL_DIRECTION scrollDirection = SCROLL_DIRECTION.NONE;
+
+        if (dy > 0) scrollDirection = SCROLL_DIRECTION.DOWN;
+        else if (dy < 0) scrollDirection = SCROLL_DIRECTION.UP;
+
+        //Show/Hide searchView
+        if (scrollDirection == SCROLL_DIRECTION.DOWN && !hidingSearchView) {
+            hideSearchView();
+        } else if (scrollDirection == SCROLL_DIRECTION.UP && hidingSearchView) {
+            showSearchView();
         }
 
         //Load ahead if getting to end of images
-        int maxScroll = recyclerView.computeVerticalScrollRange();
-        int currentScroll = recyclerView.computeVerticalScrollOffset() + recyclerView.computeVerticalScrollExtent();
-        if (!loading && dy > 0 && maxScroll - currentScroll < 4000 && currentSearchQuery != null) {
-            loading = true;
-            infiniteScrollProgressBar.setVisibility(View.VISIBLE);
-            viewModel.retrieveSearchResults(currentSearchQuery, ++currentPage, false);
+        if (scrollDirection == SCROLL_DIRECTION.DOWN && !loading) {
+            int maxScroll = recyclerView.computeVerticalScrollRange();
+            int currentScroll = recyclerView.computeVerticalScrollOffset() + recyclerView.computeVerticalScrollExtent();
+            if (maxScroll - currentScroll < SCROLL_REMAINING_WHEN_LOAD_NEXT_PAGE) {
+                loadNextPage();
+            }
         }
+    }
+
+    public void loadNextPage() {
+        loading = true;
+        infiniteScrollProgressBar.setVisibility(View.VISIBLE);
+        viewModel.retrieveSearchResults(currentSearchQuery, ++currentPage, false);
     }
 
     @Override
