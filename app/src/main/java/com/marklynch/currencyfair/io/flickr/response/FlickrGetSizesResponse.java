@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FlickrGetSizesResponse {
@@ -18,6 +19,15 @@ public class FlickrGetSizesResponse {
                 "sizes=" + sizes +
                 ", stat='" + stat + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FlickrGetSizesResponse that = (FlickrGetSizesResponse) o;
+        return Objects.equals(sizes, that.sizes) &&
+                Objects.equals(stat, that.stat);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -40,6 +50,17 @@ public class FlickrGetSizesResponse {
                     ", imageSize=" + imageSize +
                     '}';
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Sizes sizes = (Sizes) o;
+            return canblog == sizes.canblog &&
+                    canprint == sizes.canprint &&
+                    candownload == sizes.candownload &&
+                    Objects.equals(imageSize, sizes.imageSize);
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -61,6 +82,17 @@ public class FlickrGetSizesResponse {
                     ", width='" + width + '\'' +
                     ", height='" + height + '\'' +
                     '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ImageSize imageSize = (ImageSize) o;
+            return width == imageSize.width &&
+                    height == imageSize.height &&
+                    Objects.equals(label, imageSize.label) &&
+                    Objects.equals(source, imageSize.source);
         }
     }
 }
