@@ -15,20 +15,20 @@ import java.util.Vector;
 
 public class MainViewModel extends AndroidViewModel  {
 
-    public MutableLiveData<ImagesToDisplay> imageToDisplayLiveData = new MutableLiveData<>(new ImagesToDisplay());
+    public MutableLiveData<ImagesToDisplay> imagesToDisplayLiveData = new MutableLiveData<>(new ImagesToDisplay());
     private QueryToImageSizesResolver queryToImageSizesResolver;
     private FlickrImageSizesToDisplayImagesAdapter flickrImageSizesToDisplayImagesAdapter;
 
     public MainViewModel(Application application) {
         super(application);
         flickrImageSizesToDisplayImagesAdapter = new FlickrImageSizesToDisplayImagesAdapter();
-        imageToDisplayLiveData.setValue(new ImagesToDisplay());
+        imagesToDisplayLiveData.setValue(new ImagesToDisplay());
         queryToImageSizesResolver = new QueryToImageSizesResolver(application);
     }
 
     public void retrieveSearchResults(String query, int page, boolean newSearch) {
         if (newSearch)
-            imageToDisplayLiveData.setValue(new ImagesToDisplay());
+            imagesToDisplayLiveData.setValue(new ImagesToDisplay());
         queryToImageSizesResolver.getPhotoUrlsFromSearchTerm(query, flickrImageSizesToDisplayImagesAdapter, page);
     }
 
@@ -39,7 +39,7 @@ public class MainViewModel extends AndroidViewModel  {
 
         @Override
         public void allImageSizesDownload(Vector<FlickrGetSizesResponse.ImageSizes> imageSizesList) {
-            ImagesToDisplay currentImages = imageToDisplayLiveData.getValue();
+            ImagesToDisplay currentImages = imagesToDisplayLiveData.getValue();
 
             ImagesToDisplay concatenatedImages = new ImagesToDisplay();
             concatenatedImages.images.addAll(currentImages.images);
@@ -54,7 +54,7 @@ public class MainViewModel extends AndroidViewModel  {
 
             if (newImagesCount == 0)
                 concatenatedImages.errorMessage = getApplication().getString(R.string.no_images_found);
-            imageToDisplayLiveData.setValue(concatenatedImages);
+            imagesToDisplayLiveData.setValue(concatenatedImages);
         }
 
         @Override
@@ -64,11 +64,10 @@ public class MainViewModel extends AndroidViewModel  {
 
         @Override
         public void onError(int errorMessage) {
-            ImagesToDisplay currentImages = imageToDisplayLiveData.getValue();
+            ImagesToDisplay currentImages = imagesToDisplayLiveData.getValue();
             currentImages.errorMessage = getApplication().getString(errorMessage);
-            imageToDisplayLiveData.setValue(currentImages);
+            imagesToDisplayLiveData.setValue(currentImages);
         }
-
 
         private ImageToDisplay getImageToDisplay(FlickrGetSizesResponse.ImageSizes imageSizes) {
             ImageToDisplay imageToDisplay = null;

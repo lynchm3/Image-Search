@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
         }
 
         // Observer photos livedata
-        viewModel.imageToDisplayLiveData.observe(this,
+        viewModel.imagesToDisplayLiveData.observe(this,
                 imagesToDisplay ->
                 {
                     loading = false;
@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
 
     @Override
     public LiveData<ImagesToDisplay> getImagesLiveData() {
-        return viewModel.imageToDisplayLiveData;
+        return viewModel.imagesToDisplayLiveData;
     }
 
     @Override
