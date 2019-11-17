@@ -19,9 +19,8 @@ import static org.junit.Assert.assertEquals;
 
 public class QueryToImageSizesResolverTest {
 
-
-    Vector<FlickrGetSizesResponse.ImageSizes> actualImageSizesList;
-    FlickrGetSizesResponse.ImageSizes actualImageSizes;
+    private Vector<FlickrGetSizesResponse.ImageSizes> actualImageSizesList;
+    private FlickrGetSizesResponse.ImageSizes actualImageSizes;
 
     @Test
     public void getPhotoUrlsFromSearchTermTest() throws InterruptedException, IOException {
@@ -42,7 +41,7 @@ public class QueryToImageSizesResolverTest {
         QueryToImageSizesResolver.QueryResultListener queryResultListener = new QueryToImageSizesResolver.QueryResultListener()
         {
             @Override
-            public void allImageSizesDownload(Vector<FlickrGetSizesResponse.ImageSizes> imageSizesList) {
+            public void allImageSizesDownloaded(Vector<FlickrGetSizesResponse.ImageSizes> imageSizesList) {
                 actualImageSizesList = imageSizesList;
                 allImageslatch.countDown();
             }
@@ -57,6 +56,11 @@ public class QueryToImageSizesResolverTest {
             public void onError(int errorMessage) {
                 fail("onError was reached");
             }
+
+            @Override
+            public void searchDownloadedExperimental(FlickrSearchResponse flickrSearchResponse) {
+
+            }
         };
 
         queryToImageSizesResolver.getPhotoUrlsFromSearchTerm("QUERY", queryResultListener, 1);
@@ -68,7 +72,7 @@ public class QueryToImageSizesResolverTest {
             fail("singleImageSizesDownloaded() was not called enough times");
 
         if(singleImageslatch.getCount() != 0)
-            fail("allImageSizesDownload() was not called");
+            fail("allImageSizesDownloaded() was not called");
 
         assertEquals(generateExpectedGetSizesResponseList(), actualImageSizesList);
         assertEquals(generateExpectedGetSizesResponse(), actualImageSizes);

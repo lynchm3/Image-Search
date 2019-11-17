@@ -9,11 +9,14 @@ import com.bumptech.glide.Glide;
 import com.marklynch.currencyfair.R;
 import com.marklynch.currencyfair.io.flickr.QueryToImageSizesResolver;
 import com.marklynch.currencyfair.io.flickr.response.FlickrGetSizesResponse;
+import com.marklynch.currencyfair.io.flickr.response.FlickrSearchResponse;
 
 import java.util.List;
 import java.util.Vector;
 
-public class MainViewModel extends AndroidViewModel  {
+import timber.log.Timber;
+
+public class MainViewModel extends AndroidViewModel {
 
     public MutableLiveData<ImagesToDisplay> imagesToDisplayLiveData = new MutableLiveData<>(new ImagesToDisplay());
     private QueryToImageSizesResolver queryToImageSizesResolver;
@@ -32,13 +35,12 @@ public class MainViewModel extends AndroidViewModel  {
         queryToImageSizesResolver.getPhotoUrlsFromSearchTerm(query, flickrImageSizesToDisplayImagesAdapter, page);
     }
 
-    public class FlickrImageSizesToDisplayImagesAdapter implements QueryToImageSizesResolver.QueryResultListener
-    {
+    public class FlickrImageSizesToDisplayImagesAdapter implements QueryToImageSizesResolver.QueryResultListener {
         private static final String THUMB_SIZE = "Large Square";
         private static final String FULL_SIZE = "Large";
 
         @Override
-        public void allImageSizesDownload(Vector<FlickrGetSizesResponse.ImageSizes> imageSizesList) {
+        public void allImageSizesDownloaded(Vector<FlickrGetSizesResponse.ImageSizes> imageSizesList) {
             ImagesToDisplay currentImages = imagesToDisplayLiveData.getValue();
 
             ImagesToDisplay concatenatedImages = new ImagesToDisplay();
@@ -69,6 +71,24 @@ public class MainViewModel extends AndroidViewModel  {
             imagesToDisplayLiveData.setValue(currentImages);
         }
 
+        @Override
+        public void searchDownloadedExperimental(FlickrSearchResponse flickrSearchResponse) {
+            ImagesToDisplay currentImages = imagesToDisplayLiveData.getValue();
+            ImagesToDisplay concatenatedImages = new ImagesToDisplay();
+            concatenatedImages.images.addAll(currentImages.images);
+            for (FlickrSearchResponse.Photo photo : flickrSearchResponse.photos.photo) {
+                concatenatedImages.images.add(new ImageToDisplay(
+                        new ImageToDisplay.ImageInfo("https://live.staticflickr.com/" + photo.server + '/' + photo.id + '_' + photo.secret + '_' + "q.png",
+                                1,
+                                1),
+                        new ImageToDisplay.ImageInfo("https://live.staticflickr.com/" + photo.server + '/' + photo.id + '_' + photo.secret + '_' + "b.png",
+                                1,
+                                1)));
+            }
+            imagesToDisplayLiveData.setValue(concatenatedImages);
+            Timber.d("searchDownloadedExperimental concatenatedImages = " + concatenatedImages);
+        }
+
         private ImageToDisplay getImageToDisplay(FlickrGetSizesResponse.ImageSizes imageSizes) {
             ImageToDisplay imageToDisplay = null;
             ImageToDisplay.ImageInfo thumb = null;
@@ -92,7 +112,7 @@ public class MainViewModel extends AndroidViewModel  {
             if (fullImage == null)
                 fullImage = thumb;
 
-            imageToDisplay = new ImageToDisplay(thumb,fullImage);
+            imageToDisplay = new ImageToDisplay(thumb, fullImage);
 
             return imageToDisplay;
         }

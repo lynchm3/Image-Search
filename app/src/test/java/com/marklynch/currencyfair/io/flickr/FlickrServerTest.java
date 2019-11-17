@@ -74,14 +74,20 @@ public class FlickrServerTest {
 
         FlickrSearchResponse.Photo photo1 = new FlickrSearchResponse.Photo();
         photo1.id = "49074857286";
+        photo1.secret = "6ed0d57a12";
+        photo1.server = "65535";
         photos.photo.add(photo1);
 
         FlickrSearchResponse.Photo photo2 = new FlickrSearchResponse.Photo();
         photo2.id = "49074157138";
+        photo2.secret = "989d35149c";
+        photo2.server = "65535";
         photos.photo.add(photo2);
 
         FlickrSearchResponse.Photo photo3 = new FlickrSearchResponse.Photo();
         photo3.id = "49074096668";
+        photo3.secret = "daf945567f";
+        photo3.server = "65535";
         photos.photo.add(photo3);
 
         return searchResponseObject;

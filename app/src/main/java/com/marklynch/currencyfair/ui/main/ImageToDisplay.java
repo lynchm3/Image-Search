@@ -30,5 +30,14 @@ public class ImageToDisplay {
             this.width = width;
             this.height = height;
         }
+
+        @Override
+        public String toString() {
+            return "ImageInfo{" +
+                    "url='" + url + '\'' +
+                    ", width=" + width +
+                    ", height=" + height +
+                    '}';
+        }
     }
 }

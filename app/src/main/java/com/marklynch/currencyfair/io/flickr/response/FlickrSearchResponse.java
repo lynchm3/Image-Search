@@ -78,11 +78,17 @@ public class FlickrSearchResponse {
     public static class Photo {
         @JsonProperty("id")
         public String id;
+        @JsonProperty("server")
+        public String server;
+        @JsonProperty("secret")
+        public String secret;
 
         @Override
         public String toString() {
             return "Photo{" +
                     "id='" + id + '\'' +
+                    "server='" + server + '\'' +
+                    "secret='" + secret + '\'' +
                     '}';
         }
 
@@ -91,7 +97,7 @@ public class FlickrSearchResponse {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             Photo photo = (Photo) o;
-            return Objects.equals(id, photo.id);
+            return Objects.equals(id, photo.id) && Objects.equals(server, photo.server) && Objects.equals(secret, photo.secret);
         }
     }
 }
