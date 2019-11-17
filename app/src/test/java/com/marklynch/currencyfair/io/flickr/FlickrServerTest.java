@@ -32,14 +32,15 @@ public class FlickrServerTest {
 
         FlickrServer flickrServer = new FlickrServer(mockWebServer);
 
-        FlickrSearchResponse expected = generateExpectedSearchResponse();
-        final FlickrSearchResponse[] actual = {null};
+        final FlickrSearchResponse[] actualResponseBody = {null};
+        final String[] actualRequestUrl = {null};
         CountDownLatch latch = new CountDownLatch(1);
 
         Callback<FlickrSearchResponse> searchRequestCallback = new Callback<FlickrSearchResponse>() {
             @Override
             public void onResponse(@NotNull Call<FlickrSearchResponse> call, Response<FlickrSearchResponse> response) {
-                actual[0] = response.body();
+                actualRequestUrl[0] = call.request().url().toString();
+                actualResponseBody[0] = response.body();
                 latch.countDown();
             }
 
@@ -55,7 +56,10 @@ public class FlickrServerTest {
         if (latch.getCount() != 0)
             fail("onResponse was not called");
 
-        assertEquals("Search response not as expected", expected, actual[0]);
+        String expectedUrl = mockWebServer.url("/") + "services/rest?method=flickr.photos.search&api_key=" + ApiKey.API_KEY + "&tags=QUERY&page=1&format=json&nojsoncallback=1&per_page=20";
+
+        assertEquals("Search response not as expected", expectedUrl, actualRequestUrl[0]);
+        assertEquals("Search response not as expected", generateExpectedSearchResponse(), actualResponseBody[0]);
 
         mockWebServer.close();
     }
@@ -119,7 +123,6 @@ public class FlickrServerTest {
         Callback<FlickrSearchResponse> searchRequestCallback = new Callback<FlickrSearchResponse>() {
             @Override
             public void onResponse(@NotNull Call<FlickrSearchResponse> call, Response<FlickrSearchResponse> response) {
-                fail("Search request called back to onSuccess, was meant to fail");
                 latch.countDown();
             }
 
@@ -148,13 +151,16 @@ public class FlickrServerTest {
 
         FlickrServer flickrServer = new FlickrServer(mockWebServer);
 
-        FlickrGetSizesResponse expected = generateExpectedGetSizesResponse();
         CountDownLatch latch = new CountDownLatch(1);
+
+        final FlickrGetSizesResponse[] actualResponseBody = {null};
+        final String[] actualRequestUrl = {null};
 
         Callback<FlickrGetSizesResponse> getSizesRequestCallback = new Callback<FlickrGetSizesResponse>() {
             @Override
             public void onResponse(@NotNull Call<FlickrGetSizesResponse> call, Response<FlickrGetSizesResponse> response) {
-                assertEquals("Get imageSizes response not as expected", expected, response.body());
+                actualRequestUrl[0] = call.request().url().toString();
+                actualResponseBody[0] = response.body();
                 latch.countDown();
             }
 
@@ -170,6 +176,11 @@ public class FlickrServerTest {
 
         if (latch.getCount() != 0)
             fail("onResponse was not called");
+
+        String expectedUrl = mockWebServer.url("/") + "services/rest?method=flickr.photos.getSizes&api_key=" + ApiKey.API_KEY + "&format=json&nojsoncallback=1";
+
+        assertEquals("Search response not as expected", expectedUrl, actualRequestUrl[0]);
+        assertEquals("Search response not as expected", generateExpectedGetSizesResponse(), actualResponseBody[0]);
 
         mockWebServer.close();
     }
