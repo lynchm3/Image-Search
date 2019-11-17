@@ -53,7 +53,7 @@ public class FlickrServer {
     private Retrofit getRetrofitInstance(Context context) {
         return new Retrofit.Builder()
                 .baseUrl(FlickrServer.BASE_URL)
-                .client(new OkHttpClient.Builder().addInterceptor(new ChuckInterceptor(context)).build())
+                .client(new OkHttpClient.Builder().build())//.addInterceptor(new ChuckInterceptor(context)).build())
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
     }
