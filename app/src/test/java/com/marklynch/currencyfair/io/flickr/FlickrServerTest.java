@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -91,6 +92,50 @@ public class FlickrServerTest {
             "      { \"id\": \"49074157138\", \"owner\": \"185084819@N02\", \"secret\": \"989d35149c\", \"server\": \"65535\", \"farm\": 66, \"title\": \"cash back\", \"ispublic\": 1, \"isfriend\": 0, \"isfamily\": 0 },\n" +
             "      { \"id\": \"49074096668\", \"owner\": \"151822520@N05\", \"secret\": \"daf945567f\", \"server\": \"65535\", \"farm\": 66, \"title\": \"hnb5\", \"ispublic\": 1, \"isfriend\": 0, \"isfamily\": 0 }\n" +
             "    ] }, \"stat\": \"ok\" }";
+
+    @Test
+    public void testSearchRequestBadJson() throws InterruptedException, IOException {
+
+        String searchResponseString = "{ \"photos\": ERROR { \"page\": 1, \"pages\": \"5028\", \"perpage\": 3, \"total\": \"502713\", \n" +
+                "    \"photo\": [] }, \"stat\": \"ok\" }";
+
+        MockWebServer mockWebServer = new MockWebServer();
+        mockWebServer.start();
+        mockWebServer.enqueue(new MockResponse().setBody(searchResponseString));
+
+        FlickrServer flickrServer = new FlickrServer(mockWebServer);
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        AtomicBoolean reachedOnFailure = new AtomicBoolean(false);
+
+        Callback<FlickrSearchResponse> searchRequestCallback = new Callback<FlickrSearchResponse>() {
+            @Override
+            public void onResponse(@NotNull Call<FlickrSearchResponse> call, Response<FlickrSearchResponse> response) {
+                fail("Search request called back to onSuccess, was meant to fail");
+                latch.countDown();
+            }
+
+            @Override
+            public void onFailure(@NotNull Call<FlickrSearchResponse> call, @NotNull Throwable t) {
+                reachedOnFailure.set(true);
+                latch.countDown();
+            }
+        };
+        flickrServer.searchRequest("QUERY", 1, searchRequestCallback);
+
+        latch.await(2, TimeUnit.SECONDS);
+
+        if (!reachedOnFailure.get())
+            fail("Search request didn't call back to onFailure, was meant to fail");
+
+        mockWebServer.close();
+    }
+
+    @Test
+    public void testSearchRequestHttp500() throws InterruptedException, IOException {
+
+    }
 
     @Test
     public void testGetSizesRequest() throws InterruptedException, IOException {
