@@ -4,7 +4,7 @@ import java.util.Vector;
 
 public class ImagesToDisplay {
 
-    public int errorMessage = -1;
+    public String errorMessage = null;
     public Vector<ImageToDisplay> images = new Vector<>();
 
     @Override

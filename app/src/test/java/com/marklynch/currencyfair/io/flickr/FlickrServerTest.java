@@ -114,7 +114,7 @@ public class FlickrServerTest {
 
             @Override
             public void onFailure(@NotNull Call<FlickrGetSizesResponse> call, @NotNull Throwable t) {
-                fail("Get sizes request called back to onFailure");
+                fail("Get imageSizes request called back to onFailure");
                 latch.countDown();
             }
         };
@@ -122,7 +122,7 @@ public class FlickrServerTest {
 
         latch.await(2, TimeUnit.SECONDS);
 
-        assertEquals("Get sizes response not as expected", expected, actual[0]);
+        assertEquals("Get imageSizes response not as expected", expected, actual[0]);
 
         mockWebServer.close();
     }
@@ -131,34 +131,34 @@ public class FlickrServerTest {
         FlickrGetSizesResponse getSizesResponseObject = new FlickrGetSizesResponse();
         getSizesResponseObject.stat = "ok";
 
-        FlickrGetSizesResponse.Sizes sizes = new FlickrGetSizesResponse.Sizes();
-        sizes.canblog = 0;
-        sizes.canprint = 0;
-        sizes.candownload = 0;
-        sizes.imageSize = new ArrayList<>();
-        getSizesResponseObject.sizes = sizes;
+        FlickrGetSizesResponse.ImageSizes imageSizes = new FlickrGetSizesResponse.ImageSizes();
+        imageSizes.canblog = 0;
+        imageSizes.canprint = 0;
+        imageSizes.candownload = 0;
+        imageSizes.imageSize = new ArrayList<>();
+        getSizesResponseObject.imageSizes = imageSizes;
 
         FlickrGetSizesResponse.ImageSize size1 = new FlickrGetSizesResponse.ImageSize();
         size1.height = 150;
         size1.width = 150;
         size1.label = "Large Square";
         size1.source = "https://live.staticflickr.com/65535/49074857286_6ed0d57a12_q.jpg";
-        sizes.imageSize.add(size1);
+        imageSizes.imageSize.add(size1);
 
         FlickrGetSizesResponse.ImageSize size2 = new FlickrGetSizesResponse.ImageSize();
         size2.height = 809;
         size2.width = 1024;
         size2.label = "Large";
         size2.source = "https://live.staticflickr.com/65535/49074857286_6ed0d57a12_b.jpg";
-        sizes.imageSize.add(size2);
+        imageSizes.imageSize.add(size2);
 
         return getSizesResponseObject;
     }
 
-    public String getSizesResponseString = "{ \"sizes\": { \"canblog\": 0, \"canprint\": 0, \"candownload\": 0, \n" +
+    public String getSizesResponseString = "{ \"imageSizes\": { \"canblog\": 0, \"canprint\": 0, \"candownload\": 0, \n" +
             "    \"size\": [\n" +
-            "      { \"label\": \"Large Square\", \"width\": \"150\", \"height\": \"150\", \"source\": \"https:\\/\\/live.staticflickr.com\\/65535\\/49074857286_6ed0d57a12_q.jpg\", \"url\": \"https:\\/\\/www.flickr.com\\/photos\\/21611052@N02\\/49074857286\\/sizes\\/q\\/\", \"media\": \"photo\" },\n" +
-            "      { \"label\": \"Large\", \"width\": \"1024\", \"height\": \"809\", \"source\": \"https:\\/\\/live.staticflickr.com\\/65535\\/49074857286_6ed0d57a12_b.jpg\", \"url\": \"https:\\/\\/www.flickr.com\\/photos\\/21611052@N02\\/49074857286\\/sizes\\/l\\/\", \"media\": \"photo\" }\n" +
+            "      { \"label\": \"Large Square\", \"width\": \"150\", \"height\": \"150\", \"source\": \"https:\\/\\/live.staticflickr.com\\/65535\\/49074857286_6ed0d57a12_q.jpg\", \"url\": \"https:\\/\\/www.flickr.com\\/photos\\/21611052@N02\\/49074857286\\/imageSizes\\/q\\/\", \"media\": \"photo\" },\n" +
+            "      { \"label\": \"Large\", \"width\": \"1024\", \"height\": \"809\", \"source\": \"https:\\/\\/live.staticflickr.com\\/65535\\/49074857286_6ed0d57a12_b.jpg\", \"url\": \"https:\\/\\/www.flickr.com\\/photos\\/21611052@N02\\/49074857286\\/imageSizes\\/l\\/\", \"media\": \"photo\" }\n" +
             "    ] }, \"stat\": \"ok\" }";
 
 

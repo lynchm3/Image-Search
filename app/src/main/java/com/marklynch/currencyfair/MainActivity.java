@@ -102,8 +102,8 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
                     searchProgressBar.setVisibility(View.GONE);
                     infiniteScrollProgressBar.setVisibility(View.GONE);
 
-                    if (imagesToDisplay.errorMessage != -1)
-                        Toast.makeText(this, getString(imagesToDisplay.errorMessage), Toast.LENGTH_SHORT).show();
+                    if (imagesToDisplay.errorMessage != null)
+                        Toast.makeText(this, imagesToDisplay.errorMessage, Toast.LENGTH_SHORT).show();
                 });
 
         searchView.requestFocus();

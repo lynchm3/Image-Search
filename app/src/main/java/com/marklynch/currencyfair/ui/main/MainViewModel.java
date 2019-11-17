@@ -5,37 +5,94 @@ import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.marklynch.currencyfair.io.flickr.QueryToImagesResolver;
+import com.bumptech.glide.Glide;
+import com.marklynch.currencyfair.R;
+import com.marklynch.currencyfair.io.flickr.QueryToImageSizesResolver;
+import com.marklynch.currencyfair.io.flickr.response.FlickrGetSizesResponse;
 
-public class MainViewModel extends AndroidViewModel implements QueryToImagesResolver.QueryResultListener {
+import java.util.List;
+import java.util.Vector;
+
+public class MainViewModel extends AndroidViewModel implements QueryToImageSizesResolver.QueryResultListener {
 
     public MutableLiveData<ImagesToDisplay> imageToDisplayLiveData = new MutableLiveData<>(new ImagesToDisplay());
-    private QueryToImagesResolver queryToImagesResolver;
+    private QueryToImageSizesResolver queryToImageSizesResolver;
 
     public MainViewModel(Application application) {
         super(application);
-
         imageToDisplayLiveData.setValue(new ImagesToDisplay());
-
-        queryToImagesResolver = new QueryToImagesResolver(application);
+        queryToImageSizesResolver = new QueryToImageSizesResolver(application);
     }
 
     public void retrieveSearchResults(String query, int page, boolean newSearch) {
         if (newSearch)
             imageToDisplayLiveData.setValue(new ImagesToDisplay());
-        queryToImagesResolver.getPhotoUrlsFromSearchTerm(query, this, page, getApplication());
+        queryToImageSizesResolver.getPhotoUrlsFromSearchTerm(query, this, page);
     }
 
     @Override
-    public void onNewImages(ImagesToDisplay newImages) {
-
+    public void allImageSizesDownload(Vector<FlickrGetSizesResponse.ImageSizes> imageSizesList) {
         ImagesToDisplay currentImages = imageToDisplayLiveData.getValue();
 
         ImagesToDisplay concatenatedImages = new ImagesToDisplay();
-        concatenatedImages.errorMessage = newImages.errorMessage;
         concatenatedImages.images.addAll(currentImages.images);
-        concatenatedImages.images.addAll(newImages.images);
+        int newImagesCount = 0;
+        for (FlickrGetSizesResponse.ImageSizes imageSizes : imageSizesList) {
+            ImageToDisplay imageToDisplay = getImageToDisplay(imageSizes);
+            if (imageToDisplay != null) {
+                concatenatedImages.images.add(imageToDisplay);
+                newImagesCount++;
+            }
+        }
 
+        if (newImagesCount == 0)
+            concatenatedImages.errorMessage = getApplication().getString(R.string.no_images_found);
         imageToDisplayLiveData.setValue(concatenatedImages);
+    }
+
+    @Override
+    public void singleImageSizesDownloaded(FlickrGetSizesResponse.ImageSizes imageSizes) {
+        preloadThumb(imageSizes);
+    }
+
+    @Override
+    public void onError(int errorMessage) {
+        ImagesToDisplay currentImages = imageToDisplayLiveData.getValue();
+        currentImages.errorMessage = getApplication().getString(errorMessage);
+        imageToDisplayLiveData.setValue(currentImages);
+    }
+
+
+    private ImageToDisplay getImageToDisplay(FlickrGetSizesResponse.ImageSizes imageSizes) {
+        ImageToDisplay imageToDisplay = new ImageToDisplay();
+        List<FlickrGetSizesResponse.ImageSize> sizesFromResponse = imageSizes.imageSize;
+        for (FlickrGetSizesResponse.ImageSize imageSizeFromResponse : sizesFromResponse) {
+            if ("Large Square".equals(imageSizeFromResponse.label)) {
+                imageToDisplay.thumb = imageSizeFromResponse;
+            } else if ("Large".equals(imageSizeFromResponse.label)) {
+                imageToDisplay.large = imageSizeFromResponse;
+            }
+        }
+
+        if (imageToDisplay.thumb == null)
+            return null;
+
+        if (imageToDisplay.large == null)
+            imageToDisplay.large = imageToDisplay.thumb;
+
+        return imageToDisplay;
+    }
+
+    private void preloadThumb(FlickrGetSizesResponse.ImageSizes imageSizes) {
+        ImageToDisplay imageToDisplay = new ImageToDisplay();
+        List<FlickrGetSizesResponse.ImageSize> sizesFromResponse = imageSizes.imageSize;
+        for (FlickrGetSizesResponse.ImageSize imageSizeFromResponse : sizesFromResponse) {
+            if ("Large Square".equals(imageSizeFromResponse.label)) {
+                imageToDisplay.thumb = imageSizeFromResponse;
+            }
+        }
+
+        if (imageToDisplay.thumb != null)
+            Glide.with(getApplication().getApplicationContext()).load(imageToDisplay.thumb.source).submit();
     }
 }

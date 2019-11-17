@@ -9,14 +9,14 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FlickrGetSizesResponse {
     @JsonProperty("sizes")
-    public Sizes sizes;
+    public ImageSizes imageSizes;
     @JsonProperty("stat")
     public String stat;
 
     @Override
     public String toString() {
         return "FlickrGetSizesResponse{" +
-                "sizes=" + sizes +
+                "imageSizes=" + imageSizes +
                 ", stat='" + stat + '\'' +
                 '}';
     }
@@ -26,12 +26,12 @@ public class FlickrGetSizesResponse {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FlickrGetSizesResponse that = (FlickrGetSizesResponse) o;
-        return Objects.equals(sizes, that.sizes) &&
+        return Objects.equals(imageSizes, that.imageSizes) &&
                 Objects.equals(stat, that.stat);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Sizes {
+    public static class ImageSizes {
         @JsonProperty("canblog")
         public int canblog;
         @JsonProperty("canprint")
@@ -43,7 +43,7 @@ public class FlickrGetSizesResponse {
 
         @Override
         public String toString() {
-            return "Sizes{" +
+            return "ImageSizes{" +
                     "canblog=" + canblog +
                     ", canprint=" + canprint +
                     ", candownload=" + candownload +
@@ -55,11 +55,11 @@ public class FlickrGetSizesResponse {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            Sizes sizes = (Sizes) o;
-            return canblog == sizes.canblog &&
-                    canprint == sizes.canprint &&
-                    candownload == sizes.candownload &&
-                    Objects.equals(imageSize, sizes.imageSize);
+            ImageSizes imageSizes = (ImageSizes) o;
+            return canblog == imageSizes.canblog &&
+                    canprint == imageSizes.canprint &&
+                    candownload == imageSizes.candownload &&
+                    Objects.equals(imageSize, imageSizes.imageSize);
         }
     }
 
