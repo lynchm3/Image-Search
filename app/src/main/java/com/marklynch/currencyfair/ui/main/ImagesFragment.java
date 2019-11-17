@@ -140,9 +140,9 @@ public class ImagesFragment extends Fragment implements ImagesAdapter.ImageZoome
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screenWidth = displayMetrics.widthPixels;
         int screenHeight = displayMetrics.heightPixels;
-        FlickrGetSizesResponse.ImageSize large = imageToDisplay.large;
-        if (large.width > large.height) {
-            float ratio = (float) large.height / (float) large.width;
+        ImageToDisplay.ImageInfo fullImage = imageToDisplay.fullImage;
+        if (fullImage.width > fullImage.height) {
+            float ratio = (float) fullImage.height / (float) fullImage.width;
             float widthToDrawAt = screenWidth * ratio;
             expandedImageHolder.getLayoutParams().width = (int) widthToDrawAt;
         }
@@ -150,7 +150,7 @@ public class ImagesFragment extends Fragment implements ImagesAdapter.ImageZoome
         RequestOptions options = new RequestOptions().placeholder(thumbView.getDrawable());
 
         Glide.with(getActivity())
-                .load(imageToDisplay.large.source)
+                .load(fullImage.url)
                 .listener(
                         new RequestListener() {
                             @Override

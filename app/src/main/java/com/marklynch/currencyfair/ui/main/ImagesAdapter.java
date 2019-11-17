@@ -60,7 +60,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
             holder.itemView.setLayoutParams(new ConstraintLayout.LayoutParams(spaceAtTopInPixels, spaceAtTopInPixels));
             holder.imageView.setVisibility(View.INVISIBLE);
         } else {
-            String thumbUrl = imagesToDisplay.get(position - 2).thumb.source;
+            String thumbUrl = imagesToDisplay.get(position - 2).thumb.url;
             holder.itemView.setLayoutParams(new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             holder.imageView.setVisibility(View.VISIBLE);
             Glide.with(holder.imageView).load(thumbUrl).apply(options)

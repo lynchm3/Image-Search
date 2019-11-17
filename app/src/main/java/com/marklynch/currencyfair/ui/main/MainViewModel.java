@@ -71,36 +71,41 @@ public class MainViewModel extends AndroidViewModel  {
 
 
         private ImageToDisplay getImageToDisplay(FlickrGetSizesResponse.ImageSizes imageSizes) {
-            ImageToDisplay imageToDisplay = new ImageToDisplay();
+            ImageToDisplay imageToDisplay = null;
+            ImageToDisplay.ImageInfo thumb = null;
+            ImageToDisplay.ImageInfo fullImage = null;
             List<FlickrGetSizesResponse.ImageSize> sizesFromResponse = imageSizes.imageSize;
             for (FlickrGetSizesResponse.ImageSize imageSizeFromResponse : sizesFromResponse) {
                 if (THUMB_SIZE.equals(imageSizeFromResponse.label)) {
-                    imageToDisplay.thumb = imageSizeFromResponse;
+                    thumb = new ImageToDisplay.ImageInfo(imageSizeFromResponse.source,
+                            imageSizeFromResponse.width,
+                            imageSizeFromResponse.height);
                 } else if (FULL_SIZE.equals(imageSizeFromResponse.label)) {
-                    imageToDisplay.large = imageSizeFromResponse;
+                    fullImage = new ImageToDisplay.ImageInfo(imageSizeFromResponse.source,
+                            imageSizeFromResponse.width,
+                            imageSizeFromResponse.height);
                 }
             }
 
-            if (imageToDisplay.thumb == null)
+            if (thumb == null)
                 return null;
 
-            if (imageToDisplay.large == null)
-                imageToDisplay.large = imageToDisplay.thumb;
+            if (fullImage == null)
+                fullImage = thumb;
+
+            imageToDisplay = new ImageToDisplay(thumb,fullImage);
 
             return imageToDisplay;
         }
 
         private void preloadThumb(FlickrGetSizesResponse.ImageSizes imageSizes) {
-            ImageToDisplay imageToDisplay = new ImageToDisplay();
             List<FlickrGetSizesResponse.ImageSize> sizesFromResponse = imageSizes.imageSize;
             for (FlickrGetSizesResponse.ImageSize imageSizeFromResponse : sizesFromResponse) {
                 if (THUMB_SIZE.equals(imageSizeFromResponse.label)) {
-                    imageToDisplay.thumb = imageSizeFromResponse;
+                    Glide.with(getApplication().getApplicationContext()).load(imageSizeFromResponse.source).submit();
+                    return;
                 }
             }
-
-            if (imageToDisplay.thumb != null)
-                Glide.with(getApplication().getApplicationContext()).load(imageToDisplay.thumb.source).submit();
         }
     }
 }
