@@ -5,8 +5,4 @@
 
     <string name="error_loading_images">Error loading images</string>
     <string name="no_images_found">No images found</string>
-
-    <string name="no_network_title">Alert</string>
-    <string name="no_network_body">No network connection</string>
-    <string name="loading">Loading…</string>
 </resources>

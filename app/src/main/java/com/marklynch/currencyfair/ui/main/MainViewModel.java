@@ -18,9 +18,9 @@ import timber.log.Timber;
 
 public class MainViewModel extends AndroidViewModel {
 
-    public MutableLiveData<ImagesToDisplay> imagesToDisplayLiveData = new MutableLiveData<>(new ImagesToDisplay());
-    private QueryToImageSizesResolver queryToImageSizesResolver;
-    private FlickrImageSizesToDisplayImagesAdapter flickrImageSizesToDisplayImagesAdapter;
+    public final MutableLiveData<ImagesToDisplay> imagesToDisplayLiveData = new MutableLiveData<>(new ImagesToDisplay());
+    private final QueryToImageSizesResolver queryToImageSizesResolver;
+    private final FlickrImageSizesToDisplayImagesAdapter flickrImageSizesToDisplayImagesAdapter;
 
     public MainViewModel(Application application) {
         super(application);
@@ -86,7 +86,6 @@ public class MainViewModel extends AndroidViewModel {
                                 1)));
             }
             imagesToDisplayLiveData.setValue(concatenatedImages);
-            Timber.d("searchDownloadedExperimental concatenatedImages = " + concatenatedImages);
         }
 
         private ImageToDisplay getImageToDisplay(FlickrGetSizesResponse.ImageSizes imageSizes) {

@@ -19,7 +19,7 @@ import retrofit2.Response;
 
 public class QueryToImageSizesResolver {
 
-    private FlickrServer flickrServer;
+    private final FlickrServer flickrServer;
 
     public QueryToImageSizesResolver(Application application) {
         flickrServer = new FlickrServer(application);

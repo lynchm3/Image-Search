@@ -3,8 +3,8 @@ package com.marklynch.currencyfair.ui.main;
 public class ImageToDisplay {
 
 
-    public ImageInfo thumb;
-    public ImageInfo fullImage;
+    public final ImageInfo thumb;
+    public final ImageInfo fullImage;
 
     public ImageToDisplay(ImageInfo thumb, ImageInfo fullImage) {
         this.thumb = thumb;
@@ -21,9 +21,9 @@ public class ImageToDisplay {
 
     public static class ImageInfo {
 
-        public String url;
-        public int width;
-        public int height;
+        public final String url;
+        public final int width;
+        public final int height;
 
         public ImageInfo(String url, int width, int height) {
             this.url = url;

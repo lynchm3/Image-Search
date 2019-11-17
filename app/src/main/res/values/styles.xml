@@ -19,19 +19,4 @@
     <style name="cursorColor" parent="Widget.AppCompat.AutoCompleteTextView">
         <item name="android:textCursorDrawable">@drawable/search_view_cursor</item>
     </style>
-
-    <style name="h1" parent="AppTheme">
-        <item name="android:textSize">96sp</item>
-        <item name="android:fontFamily">sans-serif-thin</item>
-    </style>
-
-    <style name="h6" parent="AppTheme">
-        <item name="android:textSize">28sp</item>
-        <item name="android:textStyle">bold</item>bo
-    </style>
-
-    <style name="body1" parent="AppTheme">
-        <item name="android:textSize">18sp</item>
-    </style>
-
 </resources>

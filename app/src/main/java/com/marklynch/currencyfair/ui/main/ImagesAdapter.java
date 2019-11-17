@@ -20,18 +20,16 @@ import java.util.List;
 
 public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewHolder> {
 
-    private Activity activity;
-    private LayoutInflater mInflater;
-    private List<ImageToDisplay> imagesToDisplay = new ArrayList<>();
-    private int spaceAtTopInPixels;
+    private final LayoutInflater mInflater;
+    private final List<ImageToDisplay> imagesToDisplay = new ArrayList<>();
+    private final int spaceAtTopInPixels;
 
-    private static RequestOptions options = new RequestOptions()
+    private static final RequestOptions options = new RequestOptions()
             .centerCrop();
-    private ImageZoomer imageZoomer;
+    private final ImageZoomer imageZoomer;
 
     public ImagesAdapter(
             Activity activity, ImageZoomer imageZoomer) {
-        this.activity = activity;
         this.imageZoomer = imageZoomer;
         mInflater = LayoutInflater.from(activity);
 
@@ -41,7 +39,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.ImageViewH
 
 
     class ImageViewHolder extends RecyclerView.ViewHolder {
-        public ImageView imageView;
+        public final ImageView imageView;
 
         public ImageViewHolder(View itemView) {
             super(itemView);

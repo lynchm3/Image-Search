@@ -29,9 +29,9 @@ import static org.junit.Assert.assertTrue;
 public class MainActivityTest {
 
     @Rule
-    public IntentsTestRule activityTestRule = new IntentsTestRule(MainActivity.class, false, false);
+    public final IntentsTestRule activityTestRule = new IntentsTestRule(MainActivity.class, false, false);
 
-    public Resources resources = getInstrumentation().getTargetContext().getResources();
+    public final Resources resources = getInstrumentation().getTargetContext().getResources();
 
     @Test
     public void testInitialState() {

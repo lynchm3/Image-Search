@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.marklynch.currencyfair.io.flickr.response.FlickrGetSizesResponse;
 import com.marklynch.currencyfair.io.flickr.response.FlickrSearchResponse;
-import com.readystatesoftware.chuck.ChuckInterceptor;
 
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockWebServer;
@@ -35,7 +34,7 @@ public class FlickrServer {
         String GET_SIZES = "flickr.photos.getSizes";
     }
 
-    private FlickrService flickrService;
+    private final FlickrService flickrService;
     private static final String BASE_URL = "https://api.flickr.com";
     private static final String REST_API = "/services/rest";
     private static final String FORMAT_JSON = "json";

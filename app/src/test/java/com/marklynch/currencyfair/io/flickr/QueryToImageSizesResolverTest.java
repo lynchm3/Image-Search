@@ -116,14 +116,14 @@ public class QueryToImageSizesResolverTest {
         return responseList;
     }
 
-    public String searchResponseString = "{ \"photos\": { \"page\": 1, \"pages\": \"5028\", \"perpage\": 3, \"total\": \"502713\", \n" +
+    public final String searchResponseString = "{ \"photos\": { \"page\": 1, \"pages\": \"5028\", \"perpage\": 3, \"total\": \"502713\", \n" +
             "    \"photo\": [\n" +
             "      { \"id\": \"49074857286\", \"owner\": \"21611052@N02\", \"secret\": \"6ed0d57a12\", \"server\": \"65535\", \"farm\": 66, \"title\": \"Pizza anybody ?\", \"ispublic\": 1, \"isfriend\": 0, \"isfamily\": 0 },\n" +
             "      { \"id\": \"49074157138\", \"owner\": \"185084819@N02\", \"secret\": \"989d35149c\", \"server\": \"65535\", \"farm\": 66, \"title\": \"cash back\", \"ispublic\": 1, \"isfriend\": 0, \"isfamily\": 0 },\n" +
             "      { \"id\": \"49074096668\", \"owner\": \"151822520@N05\", \"secret\": \"daf945567f\", \"server\": \"65535\", \"farm\": 66, \"title\": \"hnb5\", \"ispublic\": 1, \"isfriend\": 0, \"isfamily\": 0 }\n" +
             "    ] }, \"stat\": \"ok\" }";
 
-    public String getSizesResponseString = "{ \"sizes\": { \"canblog\": 0, \"canprint\": 0, \"candownload\": 0, \n" +
+    public final String getSizesResponseString = "{ \"sizes\": { \"canblog\": 0, \"canprint\": 0, \"candownload\": 0, \n" +
             "    \"size\": [\n" +
             "      { \"label\": \"Large Square\", \"width\": \"150\", \"height\": \"150\", \"source\": \"https:\\/\\/live.staticflickr.com\\/65535\\/49074857286_6ed0d57a12_q.jpg\", \"url\": \"https:\\/\\/www.flickr.com\\/photos\\/21611052@N02\\/49074857286\\/imageSizes\\/q\\/\", \"media\": \"photo\" },\n" +
             "      { \"label\": \"Large\", \"width\": \"1024\", \"height\": \"809\", \"source\": \"https:\\/\\/live.staticflickr.com\\/65535\\/49074857286_6ed0d57a12_b.jpg\", \"url\": \"https:\\/\\/www.flickr.com\\/photos\\/21611052@N02\\/49074857286\\/imageSizes\\/l\\/\", \"media\": \"photo\" }\n" +
