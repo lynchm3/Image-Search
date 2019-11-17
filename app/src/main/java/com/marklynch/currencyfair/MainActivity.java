@@ -141,8 +141,8 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
 
         SCROLL_DIRECTION scrollDirection = SCROLL_DIRECTION.NONE;
 
-        if (dy > 0) scrollDirection = SCROLL_DIRECTION.DOWN;
-        else if (dy < 0) scrollDirection = SCROLL_DIRECTION.UP;
+        if (dy > 10) scrollDirection = SCROLL_DIRECTION.DOWN;
+        else if (dy < -10) scrollDirection = SCROLL_DIRECTION.UP;
 
         //Show/Hide searchView
         if (scrollDirection == SCROLL_DIRECTION.DOWN && !hidingSearchView) {
