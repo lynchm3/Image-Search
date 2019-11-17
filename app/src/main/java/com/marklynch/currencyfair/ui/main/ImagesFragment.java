@@ -30,7 +30,6 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.marklynch.currencyfair.R;
-import com.marklynch.currencyfair.io.flickr.response.FlickrGetSizesResponse;
 
 public class ImagesFragment extends Fragment implements ImagesAdapter.ImageZoomer {
 
@@ -105,6 +104,14 @@ public class ImagesFragment extends Fragment implements ImagesAdapter.ImageZoome
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + " must implement ImagesLiveDataProvider");
         }
+    }
+
+    public boolean onBackPressed() {
+        if (expandedImageView.getVisibility() == View.VISIBLE) {
+            expandedImageView.callOnClick();
+            return true;
+        }
+        return false;
     }
 
     public interface FragmentScrollListener {

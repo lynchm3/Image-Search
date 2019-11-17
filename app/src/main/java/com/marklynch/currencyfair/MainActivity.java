@@ -33,7 +33,8 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
 
     private MainViewModel viewModel;
 
-    Toolbar toolbar;
+    private Toolbar toolbar;
+    private ImagesFragment imagesFragment;
 
     private enum SCROLL_DIRECTION {NONE, UP, DOWN}
     private static final int SCROLL_REMAINING_WHEN_LOAD_NEXT_PAGE = 5000;
@@ -92,8 +93,9 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
 
         //Images Fragment
         if (savedInstanceState == null) {
+            imagesFragment = ImagesFragment.newInstance();
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, ImagesFragment.newInstance())
+                    .replace(R.id.fragment_container, imagesFragment)
                     .commitNow();
 
         }
@@ -168,5 +170,11 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
     @Override
     public LiveData<ImagesToDisplay> getImagesLiveData() {
         return viewModel.imageToDisplayLiveData;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(!imagesFragment.onBackPressed())
+            super.onBackPressed();
     }
 }
