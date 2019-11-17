@@ -7,6 +7,7 @@ import com.marklynch.currencyfair.io.flickr.response.FlickrSearchResponse;
 import com.readystatesoftware.chuck.ChuckInterceptor;
 
 import okhttp3.OkHttpClient;
+import okhttp3.mockwebserver.MockWebServer;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -16,7 +17,7 @@ import retrofit2.http.Query;
 
 import static com.marklynch.currencyfair.io.flickr.ApiKey.API_KEY;
 
-public class FlickrInterface {
+public class FlickrServer {
 
     private interface Fields {
         String METHOD = "method";
@@ -41,14 +42,26 @@ public class FlickrInterface {
     private static final int NO_JSON_CALLBACK = 1;
     static final int PER_PAGE = 20;
 
-    FlickrInterface(Context context) {
+    FlickrServer(Context context) {
         this.flickrService = getRetrofitInstance(context).create(FlickrService.class);
+    }
+
+    FlickrServer(MockWebServer mockWebServer) {
+        this.flickrService = getRetrofitInstance(mockWebServer).create(FlickrService.class);
     }
 
     private Retrofit getRetrofitInstance(Context context) {
         return new Retrofit.Builder()
-                .baseUrl(FlickrInterface.BASE_URL)
+                .baseUrl(FlickrServer.BASE_URL)
                 .client(new OkHttpClient.Builder().addInterceptor(new ChuckInterceptor(context)).build())
+                .addConverterFactory(JacksonConverterFactory.create())
+                .build();
+    }
+
+    private Retrofit getRetrofitInstance(MockWebServer mockWebServer) {
+        return new Retrofit.Builder()
+                .baseUrl(mockWebServer.url("/"))
+                .client(new OkHttpClient.Builder().build())
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
     }

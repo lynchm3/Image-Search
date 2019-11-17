@@ -20,6 +20,22 @@ buildscript {
     ext.firebase_database_version = "19.1.0"
     ext.firebase_ui_auth_version = "4.1.0"
     ext.jacksonVersion = '2.9.10'
+
+
+    //App test implementation
+    ext.junit_version = "4.12"
+    ext.junit_ext_version = "1.1.1"
+    ext.espresso_version = "3.2.0"
+    ext.test_runner_version = "1.2.0"
+    ext.core_testing_version = "2.0.0"
+    ext.test_core_version = "1.2.0"
+    ext.test_koin_version = "1.0.1"
+    ext.mockito_kotlin_version = "2.0.0"
+    ext.test_rules_version = "1.0.2"
+
+    //App android test implementation
+    ext.mockito_version = "3.0.0"
+    ext.uiautomater_version = "2.2.0"
     repositories {
         google()
         jcenter()

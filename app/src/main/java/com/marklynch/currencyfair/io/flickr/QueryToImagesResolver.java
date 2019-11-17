@@ -20,10 +20,10 @@ import retrofit2.Response;
 
 public class QueryToImagesResolver {
 
-    private FlickrInterface flickrInterface;
+    private FlickrServer flickrServer;
 
     public QueryToImagesResolver(Application application) {
-        flickrInterface = new FlickrInterface(application);
+        flickrServer = new FlickrServer(application);
     }
 
     public interface QueryResultListener {
@@ -50,7 +50,7 @@ public class QueryToImagesResolver {
                 }
 
                 //Notify listener if we have received all pages
-                if (responseCounter.incrementAndGet() % FlickrInterface.PER_PAGE == 0) {
+                if (responseCounter.incrementAndGet() % FlickrServer.PER_PAGE == 0) {
                     if (imagesToDisplay.images.size() == 0)
                         imagesToDisplay.errorMessage = R.string.error_loading_images;
                     listener.onNewImages(imagesToDisplay);
@@ -80,7 +80,7 @@ public class QueryToImagesResolver {
                 } else {
                     totalImageCount.set(response.body().photos.photo.size());
                     for (FlickrSearchResponse.Photo photo : response.body().photos.photo) {
-                        flickrInterface.getSizesRequest(photo, getSizesRequestCallback);
+                        flickrServer.getSizesRequest(photo, getSizesRequestCallback);
                     }
                 }
             }
@@ -92,7 +92,7 @@ public class QueryToImagesResolver {
             }
         };
 
-        flickrInterface.searchRequest(query, page, searchRequestCallback);
+        flickrServer.searchRequest(query, page, searchRequestCallback);
     }
 
     private ImageToDisplay getImageToDisplay(FlickrGetSizesResponse flickrGetSizesResponse) {
