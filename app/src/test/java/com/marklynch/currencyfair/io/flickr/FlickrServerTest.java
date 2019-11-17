@@ -18,8 +18,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
 
 public class FlickrServerTest {
 
@@ -45,7 +45,6 @@ public class FlickrServerTest {
 
             @Override
             public void onFailure(@NotNull Call<FlickrSearchResponse> call, @NotNull Throwable t) {
-                fail("Search request called back to onFailure");
                 latch.countDown();
             }
         };
@@ -53,10 +52,12 @@ public class FlickrServerTest {
 
         latch.await(2, TimeUnit.SECONDS);
 
+        if (latch.getCount() != 0)
+            fail("onResponse was not called");
+
         assertEquals("Search response not as expected", expected, actual[0]);
 
         mockWebServer.close();
-
     }
 
     private FlickrSearchResponse generateExpectedSearchResponse() {
@@ -133,11 +134,6 @@ public class FlickrServerTest {
     }
 
     @Test
-    public void testSearchRequestHttp500() throws InterruptedException, IOException {
-
-    }
-
-    @Test
     public void testGetSizesRequest() throws InterruptedException, IOException {
 
         MockWebServer mockWebServer = new MockWebServer();
@@ -147,13 +143,12 @@ public class FlickrServerTest {
         FlickrServer flickrServer = new FlickrServer(mockWebServer);
 
         FlickrGetSizesResponse expected = generateExpectedGetSizesResponse();
-        final FlickrGetSizesResponse[] actual = {null};
         CountDownLatch latch = new CountDownLatch(1);
 
         Callback<FlickrGetSizesResponse> getSizesRequestCallback = new Callback<FlickrGetSizesResponse>() {
             @Override
             public void onResponse(@NotNull Call<FlickrGetSizesResponse> call, Response<FlickrGetSizesResponse> response) {
-                actual[0] = response.body();
+                assertEquals("Get imageSizes response not as expected", expected, response.body());
                 latch.countDown();
             }
 
@@ -167,7 +162,8 @@ public class FlickrServerTest {
 
         latch.await(2, TimeUnit.SECONDS);
 
-        assertEquals("Get imageSizes response not as expected", expected, actual[0]);
+        if (latch.getCount() != 0)
+            fail("onResponse was not called");
 
         mockWebServer.close();
     }
@@ -200,7 +196,7 @@ public class FlickrServerTest {
         return getSizesResponseObject;
     }
 
-    public String getSizesResponseString = "{ \"imageSizes\": { \"canblog\": 0, \"canprint\": 0, \"candownload\": 0, \n" +
+    public String getSizesResponseString = "{ \"sizes\": { \"canblog\": 0, \"canprint\": 0, \"candownload\": 0, \n" +
             "    \"size\": [\n" +
             "      { \"label\": \"Large Square\", \"width\": \"150\", \"height\": \"150\", \"source\": \"https:\\/\\/live.staticflickr.com\\/65535\\/49074857286_6ed0d57a12_q.jpg\", \"url\": \"https:\\/\\/www.flickr.com\\/photos\\/21611052@N02\\/49074857286\\/imageSizes\\/q\\/\", \"media\": \"photo\" },\n" +
             "      { \"label\": \"Large\", \"width\": \"1024\", \"height\": \"809\", \"source\": \"https:\\/\\/live.staticflickr.com\\/65535\\/49074857286_6ed0d57a12_b.jpg\", \"url\": \"https:\\/\\/www.flickr.com\\/photos\\/21611052@N02\\/49074857286\\/imageSizes\\/l\\/\", \"media\": \"photo\" }\n" +

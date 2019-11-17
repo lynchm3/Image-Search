@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import okhttp3.mockwebserver.MockWebServer;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -21,6 +22,10 @@ public class QueryToImageSizesResolver {
 
     public QueryToImageSizesResolver(Application application) {
         flickrServer = new FlickrServer(application);
+    }
+
+    public QueryToImageSizesResolver(MockWebServer mockWebServer) {
+        flickrServer = new FlickrServer(mockWebServer);
     }
 
     public interface QueryResultListener {
@@ -39,9 +44,10 @@ public class QueryToImageSizesResolver {
             @Override
             public void onResponse(@NotNull Call<FlickrGetSizesResponse> call, Response<FlickrGetSizesResponse> response) {
 
-                if (!response.isSuccessful() || response.body() == null) {
+                if (!response.isSuccessful() || response.body() == null || response.body().imageSizes == null) {
 
                 } else {
+                    listener.singleImageSizesDownloaded(response.body().imageSizes);
                     imageSizes.add(response.body().imageSizes);
                 }
 
