@@ -28,6 +28,7 @@ android {
             returnDefaultValues = true
             includeAndroidResources = true
         }
+        animationsDisabled = true
     }
 
     compileOptions {
