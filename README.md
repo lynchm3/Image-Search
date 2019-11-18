@@ -21,7 +21,7 @@ Unit tests can be found ing app/src/test and Android instrumentation tests can b
 The app has been tested on Pixel emulators using SDK 29 and 22, and on a physical S8+ running SDK 28
 
 ## Libraries used
-**Retrofit** for REST calls, **Jackson** for handling JSON, **Timber** for logging, **Chuck** for monitoring http traffic in debug, **Glide** for downloading, caching and displaying images, **JUnit** for unit tests, **Espresso** for Android intrumentation tests
+**Lifecycle Livedata** for updating ui, **Retrofit** for REST calls, **Jackson** for handling JSON, **Timber** for logging, **Chuck** for monitoring http traffic in debug, **Glide** for downloading, caching and displaying images, **JUnit** for unit tests, **Espresso** for Android intrumentation tests, **OKHttp Moch Server** for testing REST interface
 
 #### Gallery with Search Bar Visible
 ![](gallery_with_search_bar.png)
