@@ -3,8 +3,6 @@ Android App to search for and display images from Flickr, tapping on an image sh
 
 ## Getting Started
 The app and tests can be built and run using Android Studio
-I have included the debug apk of the app [here](app-debug.apk) for convenience
-I've also included the API key in version control for convenience
 
 ## The App
 There's a single activity - [MainActivty](app/src/main/java/com/marklynch/currencyfair/MainActivity.java)
