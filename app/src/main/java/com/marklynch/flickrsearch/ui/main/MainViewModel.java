@@ -1,4 +1,4 @@
-package com.marklynch.currencyfair.ui.main;
+package com.marklynch.flickrsearch.ui.main;
 
 import android.app.Application;
 
@@ -6,15 +6,13 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.bumptech.glide.Glide;
-import com.marklynch.currencyfair.R;
-import com.marklynch.currencyfair.io.flickr.QueryToImageSizesResolver;
-import com.marklynch.currencyfair.io.flickr.response.FlickrGetSizesResponse;
-import com.marklynch.currencyfair.io.flickr.response.FlickrSearchResponse;
+import com.marklynch.flickrsearch.R;
+import com.marklynch.flickrsearch.io.flickr.QueryToImageSizesResolver;
+import com.marklynch.flickrsearch.io.flickr.response.FlickrGetSizesResponse;
+import com.marklynch.flickrsearch.io.flickr.response.FlickrSearchResponse;
 
 import java.util.List;
 import java.util.Vector;
-
-import timber.log.Timber;
 
 public class MainViewModel extends AndroidViewModel {
 

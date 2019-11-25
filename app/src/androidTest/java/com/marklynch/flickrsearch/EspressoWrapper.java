@@ -1,4 +1,4 @@
-package com.marklynch.currencyfair;
+package com.marklynch.flickrsearch;
 
 import android.app.Activity;
 import android.content.Context;

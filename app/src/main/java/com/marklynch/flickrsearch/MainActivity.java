@@ -1,4 +1,4 @@
-package com.marklynch.currencyfair;
+package com.marklynch.flickrsearch;
 
 import android.app.Activity;
 import android.os.Build;
@@ -15,9 +15,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.marklynch.currencyfair.ui.main.ImagesFragment;
-import com.marklynch.currencyfair.ui.main.ImagesToDisplay;
-import com.marklynch.currencyfair.ui.main.MainViewModel;
+import com.marklynch.flickrsearch.ui.main.ImagesFragment;
+import com.marklynch.flickrsearch.ui.main.ImagesToDisplay;
+import com.marklynch.flickrsearch.ui.main.MainViewModel;
 
 public class MainActivity extends AppCompatActivity implements ImagesFragment.FragmentScrollListener, ImagesFragment.ImagesLiveDataProvider {
 

@@ -1,8 +1,8 @@
-package com.marklynch.currencyfair;
+package com.marklynch.flickrsearch;
 
 import android.app.Application;
 
-import com.marklynch.currencyfair.logging.TimberDebugTree;
+import com.marklynch.flickrsearch.logging.TimberDebugTree;
 
 import timber.log.Timber;
 

@@ -1,4 +1,4 @@
-package com.marklynch.currencyfair.ui.main;
+package com.marklynch.flickrsearch.ui.main;
 
 import android.app.Activity;
 import android.content.res.Resources;
@@ -10,8 +10,8 @@ import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 
-import com.marklynch.currencyfair.MainActivity;
-import com.marklynch.currencyfair.R;
+import com.marklynch.flickrsearch.MainActivity;
+import com.marklynch.flickrsearch.R;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,8 +21,8 @@ import static androidx.test.espresso.action.ViewActions.pressImeActionButton;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
-import static com.marklynch.currencyfair.EspressoWrapper.assertKeyboardShown;
-import static com.marklynch.currencyfair.EspressoWrapper.assertViewVisible;
+import static com.marklynch.flickrsearch.EspressoWrapper.assertKeyboardShown;
+import static com.marklynch.flickrsearch.EspressoWrapper.assertViewVisible;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

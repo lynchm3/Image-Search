@@ -1,7 +1,7 @@
-package com.marklynch.currencyfair.io.flickr;
+package com.marklynch.flickrsearch.io.flickr;
 
-import com.marklynch.currencyfair.io.flickr.response.FlickrGetSizesResponse;
-import com.marklynch.currencyfair.io.flickr.response.FlickrSearchResponse;
+import com.marklynch.flickrsearch.io.flickr.response.FlickrGetSizesResponse;
+import com.marklynch.flickrsearch.io.flickr.response.FlickrSearchResponse;
 
 import org.junit.Test;
 
