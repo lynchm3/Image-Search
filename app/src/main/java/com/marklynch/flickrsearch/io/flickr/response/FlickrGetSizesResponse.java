@@ -1,4 +1,4 @@
-package com.marklynch.currencyfair.io.flickr.response;
+package com.marklynch.flickrsearch.io.flickr.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

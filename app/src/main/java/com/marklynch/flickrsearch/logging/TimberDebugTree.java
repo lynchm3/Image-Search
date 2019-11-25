@@ -1,4 +1,4 @@
-package com.marklynch.currencyfair.logging;
+package com.marklynch.flickrsearch.logging;
 
 import timber.log.Timber;
 

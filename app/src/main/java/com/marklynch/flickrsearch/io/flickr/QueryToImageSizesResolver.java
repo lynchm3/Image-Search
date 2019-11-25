@@ -1,10 +1,10 @@
-package com.marklynch.currencyfair.io.flickr;
+package com.marklynch.flickrsearch.io.flickr;
 
 import android.app.Application;
 
-import com.marklynch.currencyfair.R;
-import com.marklynch.currencyfair.io.flickr.response.FlickrGetSizesResponse;
-import com.marklynch.currencyfair.io.flickr.response.FlickrSearchResponse;
+import com.marklynch.flickrsearch.R;
+import com.marklynch.flickrsearch.io.flickr.response.FlickrGetSizesResponse;
+import com.marklynch.flickrsearch.io.flickr.response.FlickrSearchResponse;
 
 import org.jetbrains.annotations.NotNull;
 

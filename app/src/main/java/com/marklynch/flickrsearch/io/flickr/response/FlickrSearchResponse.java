@@ -1,4 +1,4 @@
-package com.marklynch.currencyfair.io.flickr.response;
+package com.marklynch.flickrsearch.io.flickr.response;
 
 //{"photos":
 //        {"page":1,"pages":2236,"perpage":100,"total":"223547","photo":

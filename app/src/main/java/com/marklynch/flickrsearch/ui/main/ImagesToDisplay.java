@@ -1,4 +1,4 @@
-package com.marklynch.currencyfair.ui.main;
+package com.marklynch.flickrsearch.ui.main;
 
 import java.util.Vector;
 

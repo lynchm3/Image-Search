@@ -1,4 +1,4 @@
-package com.marklynch.currencyfair.ui.main;
+package com.marklynch.flickrsearch.ui.main;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -29,7 +29,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
-import com.marklynch.currencyfair.R;
+import com.marklynch.flickrsearch.R;
 
 public class ImagesFragment extends Fragment implements ImagesAdapter.ImageZoomer {
 

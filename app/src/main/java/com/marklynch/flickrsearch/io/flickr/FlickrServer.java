@@ -1,9 +1,9 @@
-package com.marklynch.currencyfair.io.flickr;
+package com.marklynch.flickrsearch.io.flickr;
 
 import android.content.Context;
 
-import com.marklynch.currencyfair.io.flickr.response.FlickrGetSizesResponse;
-import com.marklynch.currencyfair.io.flickr.response.FlickrSearchResponse;
+import com.marklynch.flickrsearch.io.flickr.response.FlickrGetSizesResponse;
+import com.marklynch.flickrsearch.io.flickr.response.FlickrSearchResponse;
 
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockWebServer;
@@ -14,7 +14,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-import static com.marklynch.currencyfair.io.flickr.ApiKey.API_KEY;
+import static com.marklynch.flickrsearch.io.flickr.ApiKey.API_KEY;
 
 public class FlickrServer {
 
