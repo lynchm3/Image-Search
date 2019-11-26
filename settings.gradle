@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name='CurrencyFair Android Challenge'
+rootProject.name='Image Search'
