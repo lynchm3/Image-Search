@@ -5,13 +5,13 @@ Android App to search for and display images from Flickr, tapping on an image sh
 The app and tests can be built and run using Android Studio
 
 ## The App
-There's a single activity - [MainActivty](app/src/main/java/com/marklynch/currencyfair/MainActivity.java)
+There's a single activity - [MainActivty](app/src/main/java/com/marklynch/flickrsearch/MainActivity.java)
 
-A single single Fragment responsible for dislaying images - [ImagesFragment.java](app/src/main/java/com/marklynch/currencyfair/ui/main/ImagesFragment.java)
+A single single Fragment responsible for dislaying images - [ImagesFragment.java](app/src/main/java/com/marklynch/flickrsearch/ui/main/ImagesFragment.java)
 
-A package for interactions with the Flickr Server - [io/flickr](app/src/main/java/com/marklynch/currencyfair/io/flickr)
+A package for interactions with the Flickr Server - [io/flickr](app/src/main/java/com/marklynch/flickrsearch/io/flickr)
 
-A View Model for linking the back and front ends of the app - [MainViewModel.java](app/src/main/java/com/marklynch/currencyfair/ui/main/MainViewModel.java)
+A View Model for linking the back and front ends of the app - [MainViewModel.java](app/src/main/java/com/marklynch/flickrsearch/ui/main/MainViewModel.java)
 
 ## Tests
 Unit tests can be found ing app/src/test and Android instrumentation tests can be found in app/src/androidTest
