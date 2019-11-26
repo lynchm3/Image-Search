@@ -8,7 +8,6 @@ import com.marklynch.flickrsearch.io.flickr.response.FlickrSearchResponse;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -114,34 +113,70 @@ public class QueryToImageSizesResolver {
                 .observeOn(Schedulers.computation())
                 .subscribeWith(
 
-                new Observer<FlickrSearchResponse>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        Timber.d("getPhotoUrlsFromSearchTermZipMethod() onSubscribe");
-                    }
+                        new Observer<FlickrSearchResponse>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+                                Timber.d("getPhotoUrlsFromSearchTermZipMethod() onSubscribe");
+                            }
 
-                    @Override
-                    public void onNext(FlickrSearchResponse flickrSearchResponse) {
-                        Timber.d("getPhotoUrlsFromSearchTermZipMethod() onNext flickrSearchResponse = " + flickrSearchResponse);
-                        ArrayList<Observable<FlickrGetSizesResponse>> getSizesObservables = new ArrayList<>();
-                        for (FlickrSearchResponse.Photo photo : flickrSearchResponse.photos.photo) {
-                            getSizesObservables.add(flickrServer.getSizesRequestSync(photo.id));
-                        }
-                    }
+                            @Override
+                            public void onNext(FlickrSearchResponse flickrSearchResponse) {
+                                Timber.d("getPhotoUrlsFromSearchTermZipMethod() onNext flickrSearchResponse = " + flickrSearchResponse);
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.d("getPhotoUrlsFromSearchTermZipMethod() onError");
-                        e.printStackTrace();
+                                //TODO Use mapping instead here for photos -> photoids
+                                String[] photoIds = new String[flickrSearchResponse.photos.photo.size()];
+                                for (int i = 0; i < photoIds.length; i++) {
+                                    photoIds[i] = flickrSearchResponse.photos.photo.get(i).id;
+                                }
 
-                    }
+                                //Solution found here - https://code.tutsplus.com/tutorials/concurrency-in-rxjava-2--cms-29288
+                                Observable
+                                        .fromArray(photoIds)
+                                        .flatMap(s -> flickrServer.getSizesRequestSync(s))
+                                        .subscribeOn(Schedulers.io()).subscribeWith(
+                                        new Observer<FlickrGetSizesResponse>() {
 
-                    @Override
-                    public void onComplete() {
-                        Timber.d("getPhotoUrlsFromSearchTermZipMethod() onComplete");
+                                            @Override
+                                            public void onSubscribe(Disposable d) {
+                                                Timber.d("getPhotoUrlsFromSearchTermZipMethod() 2 onSubscribe");
 
-                    }
-                });
+                                            }
+
+                                            @Override
+                                            public void onNext(FlickrGetSizesResponse flickrGetSizesResponse) {
+                                                Timber.d("getPhotoUrlsFromSearchTermZipMethod() 2 onNext");
+                                                Timber.d("getPhotoUrlsFromSearchTermZipMethod() flickrGetSizesResponse = " + flickrGetSizesResponse);
+                                            }
+
+                                            @Override
+                                            public void onError(Throwable e) {
+                                                Timber.d("getPhotoUrlsFromSearchTermZipMethod() 2 onError");
+                                                e.printStackTrace();
+
+                                            }
+
+                                            @Override
+                                            public void onComplete() {
+                                                Timber.d("getPhotoUrlsFromSearchTermZipMethod() 2 onComplete");
+
+                                            }
+                                        }
+                                );
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                Timber.d("getPhotoUrlsFromSearchTermZipMethod() onError");
+                                e.printStackTrace();
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                Timber.d("getPhotoUrlsFromSearchTermZipMethod() onComplete");
+
+                            }
+                        });
 
 
     }
