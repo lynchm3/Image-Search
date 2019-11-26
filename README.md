@@ -22,13 +22,13 @@ The app has been tested on Pixel emulators using SDK 29 and 22, and on a physica
 **Lifecycle Livedata** for updating ui, **Retrofit** for REST calls, **Jackson** for handling JSON, **Timber** for logging, **Chuck** for monitoring http traffic in debug, **Glide** for downloading, caching and displaying images, **JUnit** for unit tests, **Espresso** for Android intrumentation tests, **OKHttp Moch Server** for testing REST interface
 
 #### Gallery with Search Bar Visible
-![](gallery_with_search_bar.png)
+<img src="gallery_with_search_bar.png" width="25%" height="25%">
 
 #### Gallery with Search Bar Hidden
-![](gallery_without_search_bar.png)
+<img src="gallery_without_search_bar.png" width="25%" height="25%">
 
 #### Expanded Image
-![](expanded_image_1.png)
+<img src="expanded_image_1.png" width="25%" height="25%">
 
 #### Expanded Image
-![](expanded_image_2.png)
+<img src="expanded_image_2.png" width="25%" height="25%">
