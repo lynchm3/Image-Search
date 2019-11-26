@@ -8,10 +8,12 @@ import com.marklynch.flickrsearch.io.flickr.response.FlickrSearchResponse;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.reactivex.Single;
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
 import okhttp3.mockwebserver.MockWebServer;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,8 +33,11 @@ public class QueryToImageSizesResolver {
 
     public interface QueryResultListener {
         void allImageSizesDownloaded(Vector<FlickrGetSizesResponse.ImageSizes> imageSizesList);
+
         void singleImageSizesDownloaded(FlickrGetSizesResponse.ImageSizes imageSizes);
+
         void onError(int errorMessage);
+
         void searchDownloadedExperimental(FlickrSearchResponse flickrSearchResponse);
     }
 
@@ -84,8 +89,10 @@ public class QueryToImageSizesResolver {
                 } else {
                     totalImageCount.set(response.body().photos.photo.size());
                     for (FlickrSearchResponse.Photo photo : response.body().photos.photo) {
-                        flickrServer.getSizesRequest(photo, getSizesRequestCallback);
+                        flickrServer.getSizesRequestAsync(photo, getSizesRequestCallback);
                     }
+
+
                 }
             }
 
@@ -95,36 +102,80 @@ public class QueryToImageSizesResolver {
             }
         };
 
-        flickrServer.searchRequest(query, page, searchRequestCallback);
+        flickrServer.searchRequestAsync(query, page, searchRequestCallback);
+    }
+
+    public void getPhotoUrlsFromSearchTermZipMethod(final String query, QueryResultListener listener, int page) {
+
+        getFlickrSearchResponseObservable(query, page).subscribeWith(
+
+                new  SingleObserver<FlickrSearchResponse>() {
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(FlickrSearchResponse flickrSearchResponse) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+                });
+
+
     }
 
 
-
-    public void getPhotoUrlsFromSearchTermExperimental(final String query, QueryResultListener listener, int page) {
-
-        final AtomicInteger responseCounter = new AtomicInteger(0);
-        final AtomicInteger totalImageCount = new AtomicInteger(0);
-        final Vector<FlickrGetSizesResponse.ImageSizes> imageSizes = new Vector<>();
-        Callback<FlickrSearchResponse> searchRequestCallback = new Callback<FlickrSearchResponse>() {
-            @Override
-            public void onResponse(@NotNull Call<FlickrSearchResponse> call, Response<FlickrSearchResponse> response) {
-                if (!response.isSuccessful() || response.body() == null) {
-                    listener.onError(R.string.error_loading_images);
-                } else if (response.body().photos.photo.size() == 0) {
-                    listener.onError(R.string.no_images_found);
-                } else {
-                    totalImageCount.set(response.body().photos.photo.size());
-                    ArrayList<String> imageURLs = new ArrayList<>();
-                    listener.searchDownloadedExperimental(response.body());
-                }
+    public Single<FlickrSearchResponse> getFlickrSearchResponseObservable(final String query, final int page) {
+        return Single.create(emitter -> {
+            try {
+                emitter.onSuccess(flickrServer.searchRequestSync(query, page).body());//ON SUCCESS TO SUBSCRIBER
+            } catch (Exception e) {
+                emitter.onError(e);//ON ERROR TO SUBSCRIBER
             }
-
-            @Override
-            public void onFailure(@NotNull Call<FlickrSearchResponse> call, @NotNull Throwable t) {
-                listener.onError(R.string.error_loading_images);
-            }
-        };
-
-        flickrServer.searchRequest(query, page, searchRequestCallback);
+        });
     }
+
+
+    public Single<FlickrGetSizesResponse> getFlickrGetSizesResponseObservable(final FlickrSearchResponse.Photo photo) {
+        return Single.create(emitter -> {
+            try {
+                emitter.onSuccess(flickrServer.getSizesRequestSync(photo).body());//ON SUCCESS TO SUBSCRIBER
+            } catch (Exception e) {
+                emitter.onError(e);//ON ERROR TO SUBSCRIBER
+            }
+        });
+    }
+
+//    public void getPhotoUrlsFromSearchTermExperimental(final String query, QueryResultListener listener, int page) {
+//
+//        final AtomicInteger responseCounter = new AtomicInteger(0);
+//        final AtomicInteger totalImageCount = new AtomicInteger(0);
+//        final Vector<FlickrGetSizesResponse.ImageSizes> imageSizes = new Vector<>();
+//        Callback<FlickrSearchResponse> searchRequestCallback = new Callback<FlickrSearchResponse>() {
+//            @Override
+//            public void onResponse(@NotNull Call<FlickrSearchResponse> call, Response<FlickrSearchResponse> response) {
+//                if (!response.isSuccessful() || response.body() == null) {
+//                    listener.onError(R.string.error_loading_images);
+//                } else if (response.body().photos.photo.size() == 0) {
+//                    listener.onError(R.string.no_images_found);
+//                } else {
+//                    totalImageCount.set(response.body().photos.photo.size());
+//                    ArrayList<String> imageURLs = new ArrayList<>();
+//                    listener.searchDownloadedExperimental(response.body());
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(@NotNull Call<FlickrSearchResponse> call, @NotNull Throwable t) {
+//                listener.onError(R.string.error_loading_images);
+//            }
+//        };
+//
+//        flickrServer.searchRequestAsync(query, page, searchRequestCallback);
+//    }
 }

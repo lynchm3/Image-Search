@@ -50,7 +50,7 @@ public class FlickrServerTest {
             }
         };
 
-        flickrServer.searchRequest("QUERY", 1, searchRequestCallback);
+        flickrServer.searchRequestAsync("QUERY", 1, searchRequestCallback);
 
         latch.await(2, TimeUnit.SECONDS);
 
@@ -133,7 +133,7 @@ public class FlickrServerTest {
                 latch.countDown();
             }
         };
-        flickrServer.searchRequest("QUERY", 1, searchRequestCallback);
+        flickrServer.searchRequestAsync("QUERY", 1, searchRequestCallback);
 
         latch.await(2, TimeUnit.SECONDS);
 
@@ -171,7 +171,7 @@ public class FlickrServerTest {
                 latch.countDown();
             }
         };
-        flickrServer.getSizesRequest(new FlickrSearchResponse.Photo(), getSizesRequestCallback);
+        flickrServer.getSizesRequestAsync(new FlickrSearchResponse.Photo(), getSizesRequestCallback);
 
         latch.await(2, TimeUnit.SECONDS);
 

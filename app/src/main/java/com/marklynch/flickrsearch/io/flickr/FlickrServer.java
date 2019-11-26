@@ -5,10 +5,13 @@ import android.content.Context;
 import com.marklynch.flickrsearch.io.flickr.response.FlickrGetSizesResponse;
 import com.marklynch.flickrsearch.io.flickr.response.FlickrSearchResponse;
 
+import java.io.IOException;
+
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockWebServer;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.http.GET;
@@ -65,11 +68,19 @@ public class FlickrServer {
                 .build();
     }
 
-    public void searchRequest(String query, int page, Callback<FlickrSearchResponse> callback) {
+    public Response<FlickrSearchResponse> searchRequestSync(String query, int page) throws IOException {
+        return flickrService.search(API_KEY, query, page, FORMAT_JSON, NO_JSON_CALLBACK, PER_PAGE).execute();
+    }
+
+    public void searchRequestAsync(String query, int page, Callback<FlickrSearchResponse> callback) {
         flickrService.search(API_KEY, query, page, FORMAT_JSON, NO_JSON_CALLBACK, PER_PAGE).enqueue(callback);
     }
 
-    public void getSizesRequest(FlickrSearchResponse.Photo photo, Callback<FlickrGetSizesResponse> callback) {
+    public Response<FlickrGetSizesResponse> getSizesRequestSync(FlickrSearchResponse.Photo photo) throws IOException {
+        return flickrService.getSizes(API_KEY, photo.id, FORMAT_JSON, NO_JSON_CALLBACK).execute();
+    }
+
+    public void getSizesRequestAsync(FlickrSearchResponse.Photo photo, Callback<FlickrGetSizesResponse> callback) {
         flickrService.getSizes(API_KEY, photo.id, FORMAT_JSON, NO_JSON_CALLBACK).enqueue(callback);
     }
 
