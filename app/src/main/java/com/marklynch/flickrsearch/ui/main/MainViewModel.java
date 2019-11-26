@@ -30,7 +30,8 @@ public class MainViewModel extends AndroidViewModel {
     public void retrieveSearchResults(String query, int page, boolean newSearch) {
         if (newSearch)
             imagesToDisplayLiveData.setValue(new ImagesToDisplay());
-        queryToImageSizesResolver.getPhotoUrlsFromSearchTerm(query, flickrImageSizesToDisplayImagesAdapter, page);
+//        queryToImageSizesResolver.getPhotoUrlsFromSearchTerm(query, flickrImageSizesToDisplayImagesAdapter, page);
+        queryToImageSizesResolver.getPhotoUrlsFromSearchTermZipMethod(query, page, flickrImageSizesToDisplayImagesAdapter);
     }
 
     public class FlickrImageSizesToDisplayImagesAdapter implements QueryToImageSizesResolver.QueryResultListener {

@@ -165,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements ImagesFragment.Fr
         loading = true;
         infiniteScrollProgressBar.setVisibility(View.VISIBLE);
         viewModel.retrieveSearchResults(currentSearchQuery, ++currentPage, false);
+
     }
 
     @Override
